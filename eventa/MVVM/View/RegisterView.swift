@@ -4,9 +4,11 @@ import Combine
 struct RegisterView: View {
     @StateObject private var viewModel = RegisterViewModel()
     var navigateToLogin: () -> Void
+    var onRegistrationComplete: () -> Void
     
-    init(navigateToLogin: @escaping () -> Void) {
+    init(navigateToLogin: @escaping () -> Void, onRegistrationComplete: @escaping () -> Void) {
         self.navigateToLogin = navigateToLogin
+        self.onRegistrationComplete = onRegistrationComplete
     }
     
     var body: some View {
@@ -40,6 +42,7 @@ struct RegisterView: View {
                 } else {
                     // Handle registration completion
                     viewModel.completeRegistration()
+                    onRegistrationComplete()
                 }
             }) {
                 Text(viewModel.currentStep == 2 ? viewModel.model.finishButtonText : viewModel.model.nextButtonText)

@@ -20,7 +20,7 @@ class RegisterViewModel: ObservableObject {
             subtitle: "Join the community, explore events, and never miss out! 🎉 Register now!",
             personalDetailsTitle: "Personal Details",
             accountDetailsTitle: "Account Details",
-            interestsTitle: "Your Interests",
+            interestsTitle: "Tell us about your interests",
             interestsSubtitle: "Tell us what excites you! 😄🎸 Choose your favorite event categories and explore the best experiences!",
             categoriesMinimumText: "Choose at least 3 Categories",
             firstNameLabel: "First Name",

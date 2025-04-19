@@ -1,9 +1,4 @@
-//
-//  eventaTests.swift
-//  eventaTests
-//
-//  Created by HT Works on 2025-04-18.
-//
+
 
 import Testing
 @testable import eventa
