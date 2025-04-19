@@ -3,9 +3,11 @@ import SwiftUI
 struct NewsFeedView: View {
     @StateObject private var viewModel = NewsFeedViewModel()
     var navigateToHome: () -> Void
+    var navigateToMap: (() -> Void)?
     
-    init(navigateToHome: @escaping () -> Void) {
+    init(navigateToHome: @escaping () -> Void, navigateToMap: (() -> Void)? = nil) {
         self.navigateToHome = navigateToHome
+        self.navigateToMap = navigateToMap
     }
     
     var body: some View {
@@ -93,6 +95,9 @@ struct NewsFeedView: View {
             
             TabButton(title: "Map", icon: "map", selectedIcon: "map.fill", isSelected: viewModel.selectedTab == 1) {
                 viewModel.selectedTab = 1
+                if let navigateToMap = navigateToMap {
+                    navigateToMap()
+                }
             }
             
             TabButton(title: "News Feed", icon: "newspaper", selectedIcon: "newspaper.fill", isSelected: viewModel.selectedTab == 2) {

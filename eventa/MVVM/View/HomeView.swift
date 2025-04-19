@@ -3,9 +3,13 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     var navigateToNewsFeed: () -> Void
+    var navigateToMap: (() -> Void)?
+    var navigateToProfile: () -> Void
     
-    init(navigateToNewsFeed: @escaping () -> Void) {
+    init(navigateToNewsFeed: @escaping () -> Void, navigateToMap: (() -> Void)? = nil, navigateToProfile: @escaping () -> Void) {
         self.navigateToNewsFeed = navigateToNewsFeed
+        self.navigateToMap = navigateToMap
+        self.navigateToProfile = navigateToProfile
     }
     
     var body: some View {
@@ -219,15 +223,21 @@ struct HomeView: View {
             
             TabButton(title: "Map", icon: "map", selectedIcon: "map.fill", isSelected: viewModel.selectedTab == 1) {
                 viewModel.selectedTab = 1
+                if let navigateToMap = navigateToMap {
+                    navigateToMap()
+                }
             }
             
             TabButton(title: "News Feed", icon: "newspaper", selectedIcon: "newspaper.fill", isSelected: viewModel.selectedTab == 2) {
                 viewModel.selectedTab = 2
                 navigateToNewsFeed()
+
             }
             
             TabButton(title: "Profile", icon: "person", selectedIcon: "person.fill", isSelected: viewModel.selectedTab == 3) {
                 viewModel.selectedTab = 3
+                navigateToProfile()
+
             }
         }
         .background(Color.white)

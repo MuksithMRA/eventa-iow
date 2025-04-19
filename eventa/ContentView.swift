@@ -11,6 +11,8 @@ struct ContentView: View {
         case trialSubscription
         case home
         case newsFeed
+        case map
+        case profile
     }
     
     var body: some View {
@@ -26,9 +28,26 @@ struct ContentView: View {
                 case .trialSubscription:
                     TrialSubscriptionView(navigateToHome: { currentView = .home })
                 case .home:
-                    HomeView(navigateToNewsFeed: { currentView = .newsFeed })
+                    HomeView(
+                        navigateToNewsFeed: { currentView = .newsFeed },
+                        navigateToMap: { currentView = .map }, navigateToProfile: {currentView = .profile}
+                    )
                 case .newsFeed:
-                    NewsFeedView(navigateToHome: { currentView = .home })
+                    NewsFeedView(
+                        navigateToHome: { currentView = .home },
+                        navigateToMap: { currentView = .map }
+                    )
+                case .map:
+                    MapView(
+                        navigateToHome: { currentView = .home }, 
+                        navigateToNewsFeed: { currentView = .newsFeed }
+                    )
+                case .profile:
+                    ProfileView(
+                        navigateToHome: { currentView = .home },
+                        navigateToMap: { currentView = .map },
+                        navigateToNewsFeed: { currentView = .newsFeed }
+                    )
                 }
             }
             .navigationBarHidden(true)
