@@ -5,11 +5,18 @@ struct HomeView: View {
     var navigateToNewsFeed: () -> Void
     var navigateToMap: (() -> Void)?
     var navigateToProfile: () -> Void
+    var navigateToNewEvent: (() -> Void)?
+    var navigateToEventDetails: ((EventItem) -> Void)?
     
-    init(navigateToNewsFeed: @escaping () -> Void, navigateToMap: (() -> Void)? = nil, navigateToProfile: @escaping () -> Void) {
+    init(navigateToNewsFeed: @escaping () -> Void, navigateToMap: (() -> Void)? = nil, navigateToProfile: @escaping () -> Void, navigateToNewEvent: (() -> Void)? = nil, navigateToEventDetails: ((EventItem) -> Void)? = nil) {
         self.navigateToNewsFeed = navigateToNewsFeed
         self.navigateToMap = navigateToMap
         self.navigateToProfile = navigateToProfile
+        self.navigateToNewEvent = navigateToNewEvent
+        self.navigateToEventDetails = navigateToEventDetails
+        
+        // Set the navigateToNewEvent closure in the view model
+        viewModel.navigateToNewEvent = navigateToNewEvent
     }
     
     var body: some View {
@@ -96,7 +103,7 @@ struct HomeView: View {
     private var actionButtonsView: some View {
         HStack(spacing: 0) {
             Button(action: {
-                viewModel.postEvent()
+                navigateToNewEvent?()
             }) {
                 VStack(spacing: 8) {
                     ZStack {
@@ -196,7 +203,7 @@ struct HomeView: View {
             HStack(spacing: 16) {
                 ForEach(viewModel.events.prefix(2)) { event in
                     FeaturedEventCard(event: event) {
-                        viewModel.joinEvent(event: event)
+                        navigateToEventDetails?(event)
                     }
                 }
             }
@@ -208,7 +215,7 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ForEach(viewModel.events) { event in
                 EventListItem(event: event) {
-                    viewModel.joinEvent(event: event)
+                    navigateToEventDetails?(event)
                 }
             }
         }
@@ -231,7 +238,6 @@ struct HomeView: View {
             TabButton(title: "News Feed", icon: "newspaper", selectedIcon: "newspaper.fill", isSelected: viewModel.selectedTab == 2) {
                 viewModel.selectedTab = 2
                 navigateToNewsFeed()
-
             }
             
             TabButton(title: "Profile", icon: "person", selectedIcon: "person.fill", isSelected: viewModel.selectedTab == 3) {

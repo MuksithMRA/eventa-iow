@@ -1,5 +1,8 @@
 import SwiftUI
 import Combine
+import MapKit
+
+
 
 struct ContentView: View {
     @State private var currentView: AppView = .welcome
@@ -13,6 +16,8 @@ struct ContentView: View {
         case newsFeed
         case map
         case profile
+        case newEvent
+        case eventDetails(EventItem)
     }
     
     var body: some View {
@@ -30,7 +35,10 @@ struct ContentView: View {
                 case .home:
                     HomeView(
                         navigateToNewsFeed: { currentView = .newsFeed },
-                        navigateToMap: { currentView = .map }, navigateToProfile: {currentView = .profile}
+                        navigateToMap: { currentView = .map }, 
+                        navigateToProfile: { currentView = .profile },
+                        navigateToNewEvent: { currentView = .newEvent },
+                        navigateToEventDetails: { event in currentView = .eventDetails(event) }
                     )
                 case .newsFeed:
                     NewsFeedView(
@@ -48,6 +56,10 @@ struct ContentView: View {
                         navigateToMap: { currentView = .map },
                         navigateToNewsFeed: { currentView = .newsFeed }
                     )
+                case .newEvent:
+                    NewEventView(onDismiss: { currentView = .home })
+                case .eventDetails(let event):
+                    EventDetailsView(event: event)
                 }
             }
             .navigationBarHidden(true)

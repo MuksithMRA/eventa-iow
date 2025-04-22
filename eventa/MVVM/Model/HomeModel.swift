@@ -15,16 +15,4 @@ struct TabItem: Identifiable {
     let selectedIcon: String
 }
 
-struct EventItem: Identifiable {
-    let id = UUID()
-    let title: String
-    let date: Date
-    let month: String
-    let day: String
-    let location: String
-    let city: String
-    let image: String
-    let color: Color
-    let joinButtonText: String
-    let timeRange: String
-}
+// EventItem moved to its own file: EventItem.swift

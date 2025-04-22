@@ -90,23 +90,36 @@ struct MapView: View {
     }
     
     private var mapContentView: some View {
-        Map(coordinateRegion: $viewModel.model.mapRegion, annotationItems: viewModel.model.eventLocations) { location in
-            MapAnnotation(coordinate: location.coordinate) {
-                ZStack {
-                    Circle()
-                        .fill(location.color)
-                        .frame(width: 36, height: 36)
-                    
-                    Image(systemName: location.icon)
-                        .font(.system(size: 16))
-                        .foregroundColor(.white)
-                }
-                .onTapGesture {
-                    viewModel.viewEventDetails(location)
+        ZStack {
+            Map(initialPosition: .region(viewModel.model.mapRegion)) {
+                ForEach(viewModel.model.eventLocations) { location in
+                    Annotation("", coordinate: location.coordinate) {
+                        ZStack {
+                            Circle()
+                                .fill(location.color)
+                                .frame(width: 36, height: 36)
+                            Image(systemName: location.icon)
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+                        }
+                        .onTapGesture {
+                            viewModel.viewEventDetails(location)
+                        }
+                    }
                 }
             }
+            .edgesIgnoringSafeArea(.all)
+            
+            // Add a transparent overlay to handle tap gestures
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    // Dismiss event details if showing
+                    if viewModel.showEventDetails {
+                        viewModel.closeEventDetails()
+                    }
+                }
         }
-        .edgesIgnoringSafeArea(.all)
     }
     
     private var nearbyEventsView: some View {

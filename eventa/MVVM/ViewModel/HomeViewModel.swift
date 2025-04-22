@@ -7,6 +7,7 @@ class HomeViewModel: ObservableObject {
     @Published var events: [EventItem]
     @Published var selectedTab: Int = 0
     @Published var userLocation: String = "Colombo, Sri Lanka"
+    var navigateToNewEvent: (() -> Void)?
     
     init() {
         self.model = HomeModel(
@@ -54,7 +55,7 @@ class HomeViewModel: ObservableObject {
     }
     
     func postEvent() {
-        // Handle posting new event
+        navigateToNewEvent?()
     }
     
     func saveEvent(event: EventItem) {
