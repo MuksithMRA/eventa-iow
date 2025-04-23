@@ -27,7 +27,7 @@ struct ContentView: View {
                 case .welcome:
                     WelcomeView(navigateToLogin: { currentView = .register })
                 case .login:
-                    LoginView()
+                    LoginView(navigateToHome: { currentView = .home })
                 case .register:
                     RegisterView(navigateToLogin: { currentView = .login }, onRegistrationComplete: { currentView = .trialSubscription })
                 case .trialSubscription:

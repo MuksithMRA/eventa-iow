@@ -1,11 +1,18 @@
 import Foundation
 import SwiftUI
 import Combine
+import LocalAuthentication
 
 class LoginViewModel: ObservableObject {
     @Published var model = LoginModel()
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var biometricType: BiometricType = .none
+    @Published var showBiometricLogin: Bool = false
+    
+    init() {
+        biometricType = BiometricAuthManager.shared.getBiometricType()
+    }
     
     func login() {
         guard model.isFormValid else {
@@ -24,6 +31,9 @@ class LoginViewModel: ObservableObject {
             
             if self?.model.email == "test@example.com" && self?.model.password == "password" {
                 self?.errorMessage = nil
+                if let email = self?.model.email, let password = self?.model.password {
+                    BiometricAuthManager.shared.saveCredentials(email: email, password: password)
+                }
             } else {
                 self?.errorMessage = "Invalid email or password"
             }
@@ -36,5 +46,13 @@ class LoginViewModel: ObservableObject {
     
     func toggleLoginMethod() {
         model.isEmailLogin.toggle()
+    }
+    
+    func canUseBiometrics() -> Bool {
+        return BiometricAuthManager.shared.canUseBiometrics() && BiometricAuthManager.shared.getSavedEmail() != nil
+    }
+    
+    func showFaceIDLogin() {
+        showBiometricLogin = true
     }
 }

@@ -1,7 +1,9 @@
 import SwiftUI
+import LocalAuthentication
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
+    var navigateToHome: (() -> Void)?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -12,17 +14,26 @@ struct LoginView: View {
                 .clipped()
             
             VStack(alignment: .leading, spacing: 20) {
-                HStack {
-                    Text("Login with Email")
-                        .font(.system(size: 16, weight: .medium))
-                    
-                    Spacer()
-                    
-                    Toggle("", isOn: $viewModel.model.isEmailLogin)
-                        .labelsHidden()
-                        .tint(.blue)
+                if viewModel.canUseBiometrics() {
+                    Button(action: {
+                        viewModel.showFaceIDLogin()
+                    }) {
+                        HStack {
+                            Image(systemName: viewModel.biometricType == .faceID ? "faceid" : "touchid")
+                                .font(.system(size: 20))
+                                .foregroundColor(.blue)
+                            
+                            Text("Login with \(viewModel.biometricType.description)")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.blue)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(12)
+                    }
+                    .padding(.top, 8)
                 }
-                .padding(.top, 20)
                 
                 if viewModel.model.isEmailLogin {
                     VStack(alignment: .leading, spacing: 8) {
@@ -115,5 +126,8 @@ struct LoginView: View {
         }
         .edgesIgnoringSafeArea(.top)
         .background(Color(.systemGray6).edgesIgnoringSafeArea(.all))
+        .fullScreenCover(isPresented: $viewModel.showBiometricLogin) {
+            FaceIDLoginView(navigateToHome: navigateToHome)
+        }
     }
 }
