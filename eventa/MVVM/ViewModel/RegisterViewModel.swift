@@ -80,14 +80,14 @@ class RegisterViewModel: ObservableObject {
     }
     
     func completeRegistration() {
-        // Handle registration completion
+        
     }
     
     func viewPrivacyPolicy() {
-        // Handle privacy policy viewing
+        
     }
     
     func viewTermsConditions() {
-        // Handle terms and conditions viewing
+        
     }
 }

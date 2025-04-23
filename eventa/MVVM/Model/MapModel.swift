@@ -7,7 +7,7 @@ struct MapModel {
     let nearbyEventsTitle: String = "Nearby Events"
     
     var mapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 6.9271, longitude: 79.8612), // Colombo, Sri Lanka
+        center: CLLocationCoordinate2D(latitude: 6.9271, longitude: 79.8612),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     

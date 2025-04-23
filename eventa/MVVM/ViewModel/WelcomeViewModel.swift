@@ -13,6 +13,6 @@ class WelcomeViewModel: ObservableObject {
     }
     
     func getStarted() {
-        // Navigation logic would go here
+        
     }
 }

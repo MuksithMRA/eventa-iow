@@ -24,10 +24,10 @@ class TrialSubscriptionViewModel: ObservableObject {
     }
     
     func startFreeTrial() {
-        // Handle trial subscription activation
+        
     }
     
     func dismissSubscription() {
-        // Handle dismissal of subscription screen
+        
     }
 }

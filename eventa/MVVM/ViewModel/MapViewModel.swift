@@ -40,9 +40,7 @@ class MapViewModel: ObservableObject {
     }
     
     func getScreenPoint(for coordinate: CLLocationCoordinate2D) -> CGPoint? {
-        // This is a placeholder implementation since we can't actually convert map coordinates to screen coordinates
-        // In a real implementation, we would need to use a MKMapView and convert the coordinates
-        // For now, we'll just return nil, which will hide the annotations
+
         return nil
     }
 }

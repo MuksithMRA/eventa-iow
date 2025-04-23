@@ -109,12 +109,11 @@ struct MapView: View {
                 }
             }
             .edgesIgnoringSafeArea(.all)
-            
-            // Add a transparent overlay to handle tap gestures
+
             Color.clear
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    // Dismiss event details if showing
+                    
                     if viewModel.showEventDetails {
                         viewModel.closeEventDetails()
                     }

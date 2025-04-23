@@ -13,4 +13,6 @@ struct EventItem: Identifiable {
     let color: Color
     let joinButtonText: String
     let timeRange: String
+    let price:Double
+    let isJoined: Bool
 }

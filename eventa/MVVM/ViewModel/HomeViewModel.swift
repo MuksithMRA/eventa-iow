@@ -33,7 +33,9 @@ class HomeViewModel: ObservableObject {
                 image: "event1",
                 color: .blue,
                 joinButtonText: "Join",
-                timeRange: "9:00 AM to 3:00 PM"
+                timeRange: "9:00 AM to 3:00 PM",
+                price: 1000.0,
+                isJoined: false
             ),
             EventItem(
                 title: "Volunteer Beach Cleaning",
@@ -45,13 +47,15 @@ class HomeViewModel: ObservableObject {
                 image: "event2",
                 color: .gray,
                 joinButtonText: "Join",
-                timeRange: "9:00 AM to 3:00 PM"
+                timeRange: "9:00 AM to 3:00 PM",
+                price: 500.0,
+                isJoined: false
             )
         ]
     }
     
     func joinEvent(event: EventItem) {
-        // Handle joining event
+        
     }
     
     func postEvent() {
@@ -59,14 +63,14 @@ class HomeViewModel: ObservableObject {
     }
     
     func saveEvent(event: EventItem) {
-        // Handle saving event
+        
     }
     
     func viewCategory() {
-        // Handle viewing category
+        
     }
     
     func viewNotifications() {
-        // Handle viewing notifications
+        
     }
 }

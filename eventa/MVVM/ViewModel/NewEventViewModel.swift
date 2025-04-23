@@ -19,8 +19,7 @@ class NewEventViewModel: ObservableObject {
     }
     
     func saveEvent(completion: @escaping () -> Void) {
-        // Here we would typically save the event to a database or API
-        // For now, we'll just call the completion handler
+
         completion()
     }
     

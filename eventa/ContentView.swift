@@ -2,8 +2,6 @@ import SwiftUI
 import Combine
 import MapKit
 
-
-
 struct ContentView: View {
     @State private var currentView: AppView = .welcome
     
@@ -18,6 +16,7 @@ struct ContentView: View {
         case profile
         case newEvent
         case eventDetails(EventItem)
+        case savedEvents
     }
     
     var body: some View {
@@ -35,10 +34,11 @@ struct ContentView: View {
                 case .home:
                     HomeView(
                         navigateToNewsFeed: { currentView = .newsFeed },
-                        navigateToMap: { currentView = .map }, 
+                        navigateToMap: { currentView = .map },
                         navigateToProfile: { currentView = .profile },
                         navigateToNewEvent: { currentView = .newEvent },
-                        navigateToEventDetails: { event in currentView = .eventDetails(event) }
+                        navigateToEventDetails: { event in currentView = .eventDetails(event) },
+                        navigateToSavedEvents: { currentView = .savedEvents }
                     )
                 case .newsFeed:
                     NewsFeedView(
@@ -47,7 +47,7 @@ struct ContentView: View {
                     )
                 case .map:
                     MapView(
-                        navigateToHome: { currentView = .home }, 
+                        navigateToHome: { currentView = .home },
                         navigateToNewsFeed: { currentView = .newsFeed }
                     )
                 case .profile:
@@ -59,7 +59,15 @@ struct ContentView: View {
                 case .newEvent:
                     NewEventView(onDismiss: { currentView = .home })
                 case .eventDetails(let event):
-                    EventDetailsView(event: event)
+                    EventDetailsView(event: event, navigateToHome: { currentView = .home })
+                    
+                case .savedEvents:
+                    SavedEventsView(
+                        navigateToHome: { currentView = .home },
+                        navigateToEventDetails: { event in
+                            currentView = .eventDetails(event)
+                        }
+                    )
                 }
             }
             .navigationBarHidden(true)

@@ -40,7 +40,7 @@ struct RegisterView: View {
                 if viewModel.currentStep < 2 {
                     viewModel.goToNextStep()
                 } else {
-                    // Handle registration completion
+                    
                     viewModel.completeRegistration()
                     onRegistrationComplete()
                 }

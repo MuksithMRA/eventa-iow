@@ -7,15 +7,16 @@ struct HomeView: View {
     var navigateToProfile: () -> Void
     var navigateToNewEvent: (() -> Void)?
     var navigateToEventDetails: ((EventItem) -> Void)?
+    var navigateToSavedEvents: (() -> Void)?
     
-    init(navigateToNewsFeed: @escaping () -> Void, navigateToMap: (() -> Void)? = nil, navigateToProfile: @escaping () -> Void, navigateToNewEvent: (() -> Void)? = nil, navigateToEventDetails: ((EventItem) -> Void)? = nil) {
+    init(navigateToNewsFeed: @escaping () -> Void, navigateToMap: (() -> Void)? = nil, navigateToProfile: @escaping () -> Void, navigateToNewEvent: (() -> Void)? = nil, navigateToEventDetails: ((EventItem) -> Void)? = nil, navigateToSavedEvents: (() -> Void)? = nil) {
         self.navigateToNewsFeed = navigateToNewsFeed
         self.navigateToMap = navigateToMap
         self.navigateToProfile = navigateToProfile
         self.navigateToNewEvent = navigateToNewEvent
         self.navigateToEventDetails = navigateToEventDetails
-        
-        // Set the navigateToNewEvent closure in the view model
+        self.navigateToSavedEvents = navigateToSavedEvents
+
         viewModel.navigateToNewEvent = navigateToNewEvent
     }
     
@@ -124,7 +125,7 @@ struct HomeView: View {
             }
             
             Button(action: {
-                // Handle saved events
+                navigateToSavedEvents?()
             }) {
                 VStack(spacing: 8) {
                     ZStack {

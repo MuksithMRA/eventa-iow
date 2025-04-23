@@ -56,19 +56,19 @@ class NewsFeedViewModel: ObservableObject {
     }
     
     func followOrganization(_ organization: Organization) {
-        // Handle following organization
+        
     }
     
     func likePost(_ post: Post) {
-        // Handle liking post
+        
     }
     
     func commentOnPost(_ post: Post) {
-        // Handle commenting on post
+        
     }
     
     func sharePost(_ post: Post) {
-        // Handle sharing post
+        
     }
     
     func formatCount(_ count: Int) -> String {

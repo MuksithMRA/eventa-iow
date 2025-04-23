@@ -173,7 +173,7 @@ struct PostCard: View {
                 Spacer()
                 
                 Button(action: {
-                    // Follow action
+                    
                 }) {
                     Text(post.organization.isFollowing ? "Following" : "Follow")
                         .font(.system(size: 14, weight: .medium))

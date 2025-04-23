@@ -20,14 +20,14 @@ class EventDetailsViewModel: ObservableObject {
     }
     
     func shareEvent() {
-        // Implementation for sharing event
+        
     }
     
     func openReviews() {
-        // Implementation for opening reviews
+        
     }
     
     func openMap() {
-        // Implementation for opening map
+        
     }
 }

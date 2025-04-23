@@ -14,5 +14,3 @@ struct TabItem: Identifiable {
     let icon: String
     let selectedIcon: String
 }
-
-// EventItem moved to its own file: EventItem.swift
