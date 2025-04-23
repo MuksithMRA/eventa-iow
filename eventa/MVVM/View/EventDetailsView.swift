@@ -7,10 +7,12 @@ struct EventDetailsView: View {
     @State private var showReviews: Bool = false
     @State private var selectedReviewType: ReviewType = .positive
     var navigateToHome: (() -> Void)?
+    var navigateToTicketPurchase: (() -> Void)?
     
-    init(event: EventItem, navigateToHome: (() -> Void)? = nil) {
+    init(event: EventItem, navigateToHome: (() -> Void)? = nil, navigateToTicketPurchase: (() -> Void)? = nil) {
         _viewModel = StateObject(wrappedValue: EventDetailsViewModel(event: event))
         self.navigateToHome = navigateToHome
+        self.navigateToTicketPurchase = navigateToTicketPurchase
     }
     
     var body: some View {
@@ -295,6 +297,9 @@ struct EventDetailsView: View {
         VStack {
             Button(action: {
                 viewModel.joinEvent()
+                if let navigateToTicketPurchase = navigateToTicketPurchase {
+                    navigateToTicketPurchase()
+                }
             }) {
                 Text(viewModel.model.joinButtonText)
                     .font(.system(size: 18, weight: .bold))

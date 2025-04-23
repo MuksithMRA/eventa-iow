@@ -17,6 +17,7 @@ struct ContentView: View {
         case newEvent
         case eventDetails(EventItem)
         case savedEvents
+        case ticketPurchase(EventItem)
     }
     
     var body: some View {
@@ -59,7 +60,11 @@ struct ContentView: View {
                 case .newEvent:
                     NewEventView(onDismiss: { currentView = .home })
                 case .eventDetails(let event):
-                    EventDetailsView(event: event, navigateToHome: { currentView = .home })
+                    EventDetailsView(
+                        event: event, 
+                        navigateToHome: { currentView = .home },
+                        navigateToTicketPurchase: { currentView = .ticketPurchase(event) }
+                    )
                     
                 case .savedEvents:
                     SavedEventsView(
@@ -67,6 +72,12 @@ struct ContentView: View {
                         navigateToEventDetails: { event in
                             currentView = .eventDetails(event)
                         }
+                    )
+                    
+                case .ticketPurchase(let event):
+                    TicketPurchaseView(
+                        event: event,
+                        navigateToHome: { currentView = .home }
                     )
                 }
             }
