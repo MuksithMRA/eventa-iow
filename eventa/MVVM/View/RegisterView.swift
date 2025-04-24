@@ -34,25 +34,46 @@ struct RegisterView: View {
                 interestsView
             }
             
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(.system(size: 14))
+                    .foregroundColor(.red)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 8)
+            }
+            
             Spacer()
             
             Button(action: {
                 if viewModel.currentStep < 2 {
                     viewModel.goToNextStep()
                 } else {
-                    
                     viewModel.completeRegistration()
-                    onRegistrationComplete()
                 }
             }) {
-                Text(viewModel.currentStep == 2 ? viewModel.model.finishButtonText : viewModel.model.nextButtonText)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.blue)
-                    .cornerRadius(12)
+                HStack {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .padding(.trailing, 8)
+                    }
+                    
+                    Text(viewModel.currentStep == 2 ? viewModel.model.finishButtonText : viewModel.model.nextButtonText)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color.blue)
+                .cornerRadius(12)
             }
+            .onChange(of: viewModel.isRegistered) { isRegistered in
+                if isRegistered {
+                    print("Registration complete, navigating to trial subscription")
+                    onRegistrationComplete()
+                }
+            }
+            .disabled(viewModel.isLoading)
             .padding(.horizontal, 24)
             
             if viewModel.currentStep == 0 {
@@ -242,6 +263,22 @@ struct RegisterView: View {
                         Text(viewModel.model.termsConditionsText)
                             .font(.system(size: 14))
                             .foregroundColor(.blue)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    HStack(alignment: .top, spacing: 10) {
+                        Button(action: {
+                            viewModel.agreeToTerms.toggle()
+                        }) {
+                            Image(systemName: viewModel.agreeToTerms ? "checkmark.square.fill" : "square")
+                                .foregroundColor(viewModel.agreeToTerms ? .blue : .gray)
+                                .font(.system(size: 20))
+                        }
+                        
+                        Text("I agree to the Terms & Conditions and Privacy Policy")
+                            .font(.system(size: 14))
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.leading)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
