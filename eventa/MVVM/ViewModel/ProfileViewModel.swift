@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import os.log
 
+
 // Local access to SubscriptionAPI
 class SubscriptionAPIAccess {
     static let shared = SubscriptionAPIAccess()
@@ -11,7 +12,7 @@ class SubscriptionAPIAccess {
     
     func getCurrentSubscription() async throws -> SubscriptionDetailsResponse {
         let baseURL = "http://localhost:5001/api/subscriptions"
-        let token = UserDefaults.standard.string(forKey: "auth_token")
+        let token = TokenManager.shared.getToken()
         
         let url = URL(string: "\(baseURL)/current")!
         var request = URLRequest(url: url)
@@ -42,7 +43,7 @@ class SubscriptionAPIAccess {
     
     func startTrial() async throws -> SubscriptionResponse {
         let baseURL = "http://localhost:5001/api/subscriptions"
-        let token = UserDefaults.standard.string(forKey: "auth_token")
+        let token = TokenManager.shared.getToken()
         
         let url = URL(string: "\(baseURL)/trial")!
         var request = URLRequest(url: url)
