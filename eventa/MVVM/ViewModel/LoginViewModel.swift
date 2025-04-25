@@ -40,6 +40,7 @@ class LoginViewModel: ObservableObject {
                     BiometricAuthManager.shared.saveCredentials(email: model.email, password: model.password)
                     
                     self.isAuthenticated = true
+                    NotificationCenter.default.post(name: NSNotification.Name("UserDidLogin"), object: nil)
                 }
             } catch let error as APIError {
                 await MainActor.run {
@@ -82,6 +83,7 @@ class LoginViewModel: ObservableObject {
                     BiometricAuthManager.shared.saveCredentials(email: model.email, password: model.password)
                     
                     self.isAuthenticated = true
+                    NotificationCenter.default.post(name: NSNotification.Name("UserDidLogin"), object: nil)
                 }
             } catch let error as APIError {
                 await MainActor.run {

@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth.routes');
 const eventRoutes = require('./routes/event.routes');
 const userRoutes = require('./routes/user.routes');
+const subscriptionRoutes = require('./routes/subscription.routes');
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(morgan('dev'));
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Eventa API' });

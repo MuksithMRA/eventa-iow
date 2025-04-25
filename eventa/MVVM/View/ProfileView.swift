@@ -5,11 +5,13 @@ struct ProfileView: View {
     var navigateToHome: () -> Void
     var navigateToMap: () -> Void
     var navigateToNewsFeed: () -> Void
+    var navigateToLogin: (() -> Void)?
     
-    init(navigateToHome: @escaping () -> Void, navigateToMap: @escaping () -> Void, navigateToNewsFeed: @escaping () -> Void) {
+    init(navigateToHome: @escaping () -> Void, navigateToMap: @escaping () -> Void, navigateToNewsFeed: @escaping () -> Void, navigateToLogin: (() -> Void)? = nil) {
         self.navigateToHome = navigateToHome
         self.navigateToMap = navigateToMap
         self.navigateToNewsFeed = navigateToNewsFeed
+        self.navigateToLogin = navigateToLogin
     }
     
     var body: some View {
@@ -20,8 +22,12 @@ struct ProfileView: View {
                     
                     statsView
                     
-                    if viewModel.isPremiumUser {
+                    if viewModel.isLoading {
+                        subscriptionLoadingView
+                    } else if viewModel.isPremiumUser {
                         premiumBadgeView
+                    } else {
+                        freeTrialBannerView
                     }
                     
                     upcomingEventsView
@@ -103,15 +109,90 @@ struct ProfileView: View {
                 Text("Premium Member")
                     .font(.system(size: 18, weight: .bold))
                 
-                Text("Your subscription is active until May 19, 2025")
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
+                if let expiryDate = viewModel.subscriptionExpiryDate {
+                    let formattedDate = formatDate(expiryDate)
+                    Text("Your subscription is active until \(formattedDate)")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                } else {
+                    Text("Your subscription is active")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()
         }
         .padding(16)
         .background(Color.blue.opacity(0.1))
+        .cornerRadius(12)
+        .padding(.horizontal, 16)
+    }
+    
+    private var freeTrialBannerView: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 16) {
+                Image(systemName: "star.circle.fill")
+                    .foregroundColor(.blue)
+                    .font(.system(size: 32))
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Upgrade to Premium")
+                        .font(.system(size: 18, weight: .bold))
+                    
+                    Text("Get access to exclusive features and benefits")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+            }
+            
+            if viewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.blue.opacity(0.7))
+                    .cornerRadius(8)
+            } else {
+                Button(action: {
+                    viewModel.startFreeTrial()
+                }) {
+                    Text("Start Free 14-Day Trial")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                }
+                .disabled(viewModel.isLoading)
+            }
+            
+//            if let errorMessage = viewModel.errorMessage {
+//                Text(errorMessage)
+//                    .font(.system(size: 14))
+//                    .foregroundColor(.red)
+//                    .padding(.top, 8)
+//            }
+        }
+        .padding(16)
+        .background(Color.blue.opacity(0.1))
+        .cornerRadius(12)
+        .padding(.horizontal, 16)
+    }
+    
+    private var subscriptionLoadingView: some View {
+        HStack {
+            Spacer()
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                .scaleEffect(1.2)
+                .padding(24)
+            Spacer()
+        }
+        .background(Color.blue.opacity(0.05))
         .cornerRadius(12)
         .padding(.horizontal, 16)
     }
@@ -144,7 +225,12 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 ForEach(viewModel.model.menuItems) { item in
                     Button(action: {
-                        viewModel.handleMenuItemTap(item)
+                        if item.title == "Logout" {
+                            viewModel.logout()
+                            navigateToLogin?()
+                        } else {
+                            viewModel.handleMenuItemTap(item)
+                        }
                     }) {
                         HStack(spacing: 16) {
                             Image(systemName: item.icon)
@@ -271,6 +357,20 @@ struct EventCard: View {
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
+
+extension ProfileView {
+    func formatDate(_ isoDateString: String) -> String {
+        let dateFormatter = ISO8601DateFormatter()
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateStyle = .medium
+        displayFormatter.timeStyle = .none
+        
+        if let date = dateFormatter.date(from: isoDateString) {
+            return displayFormatter.string(from: date)
+        }
+        return isoDateString
     }
 }
 

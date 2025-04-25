@@ -4,6 +4,9 @@ import LocalAuthentication
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
     var navigateToHome: (() -> Void)?
+    var navigateToRegister: (() -> Void)?
+    
+    @State private var isInitialLoad = true
     
     var body: some View {
         VStack(spacing: 0) {
@@ -96,7 +99,7 @@ struct LoginView: View {
                     .padding(.top, 10)
                     
                     Button(action: {
-                        viewModel.register()
+                        navigateToRegister?()
                     }) {
                         Text("Register")
                             .font(.system(size: 18, weight: .medium))
@@ -128,6 +131,18 @@ struct LoginView: View {
         .background(Color(.systemGray6).edgesIgnoringSafeArea(.all))
         .fullScreenCover(isPresented: $viewModel.showBiometricLogin) {
             FaceIDLoginView(navigateToHome: navigateToHome)
+        }
+        .onReceive(viewModel.$isAuthenticated) { isAuthenticated in
+            if isAuthenticated && !isInitialLoad {
+                navigateToHome?()
+            }
+            
+            if isInitialLoad {
+                isInitialLoad = false
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("UserDidLogin"))) { _ in
+            navigateToHome?()
         }
     }
 }

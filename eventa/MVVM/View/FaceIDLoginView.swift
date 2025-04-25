@@ -1,5 +1,7 @@
 import SwiftUI
 import LocalAuthentication
+import Combine
+import Foundation
 
 struct FaceIDLoginView: View {
     @StateObject private var viewModel = FaceIDLoginViewModel()
@@ -17,7 +19,7 @@ struct FaceIDLoginView: View {
             VStack(alignment: .center, spacing: 24) {
                 Spacer()
                 
-                Image(systemName: viewModel.biometricType == .faceID ? "faceid" : "touchid")
+                Image(systemName: viewModel.biometricType.description == "Face ID" ? "faceid" : "touchid")
                     .font(.system(size: 60))
                     .foregroundColor(.blue)
                 
@@ -70,7 +72,7 @@ struct FaceIDLoginView: View {
             .padding(.vertical, 40)
         }
         .edgesIgnoringSafeArea(.top)
-        .background(Color(.systemGray6).edgesIgnoringSafeArea(.all))
+        .background(Color.gray.opacity(0.1).edgesIgnoringSafeArea(.all))
         .onAppear {
             viewModel.checkBiometricAvailability()
         }
@@ -81,6 +83,7 @@ class FaceIDLoginViewModel: ObservableObject {
     @Published var biometricType: BiometricType = .none
     @Published var errorMessage: String?
     @Published var savedEmail: String?
+    @Published var isAuthenticated = false
     
     init() {
         biometricType = BiometricAuthManager.shared.getBiometricType()
@@ -121,12 +124,26 @@ class FaceIDLoginViewModel: ObservableObject {
     }
     
     private func validateCredentials(email: String, password: String, completion: @escaping (Bool) -> Void) {
-        if email == "test@example.com" && password == "password" {
-            errorMessage = nil
-            completion(true)
-        } else {
-            errorMessage = "Invalid credentials. Please login with email."
-            completion(false)
+        Task {
+            do {
+                let response = try await AuthAPI.shared.login(email: email, password: password)
+                await MainActor.run {
+                    TokenManager.shared.saveToken(response.token)
+                    self.errorMessage = nil
+                    self.isAuthenticated = true
+                    completion(true)
+                }
+            } catch let error as APIError {
+                await MainActor.run {
+                    self.errorMessage = error.message
+                    completion(false)
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "Login failed: \(error.localizedDescription)"
+                    completion(false)
+                }
+            }
         }
     }
 }

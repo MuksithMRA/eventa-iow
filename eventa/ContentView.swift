@@ -3,7 +3,27 @@ import Combine
 import MapKit
 
 struct ContentView: View {
-    @State private var currentView: AppView = .welcome
+    @State private var currentView: AppView
+    
+    init() {
+        let initialView: AppView = ContentView.isUserLoggedIn() ? .home : .login
+        _currentView = State(initialValue: initialView)
+    }
+    
+    static func isUserLoggedIn() -> Bool {
+        if let tokenManagerClass = NSClassFromString("TokenManager") as? NSObject.Type,
+           let sharedInstance = tokenManagerClass.value(forKey: "shared") as? NSObject {
+            
+            let selector = NSSelectorFromString("isLoggedIn")
+            if sharedInstance.responds(to: selector) {
+                let result = sharedInstance.perform(selector)
+                if let isLoggedIn = result?.takeUnretainedValue() as? Bool {
+                    return isLoggedIn
+                }
+            }
+        }
+        return false
+    }
     
     enum AppView {
         case welcome
@@ -27,7 +47,10 @@ struct ContentView: View {
                 case .welcome:
                     WelcomeView(navigateToLogin: { currentView = .register })
                 case .login:
-                    LoginView(navigateToHome: { currentView = .home })
+                    LoginView(
+                        navigateToHome: { currentView = .home },
+                        navigateToRegister: { currentView = .register }
+                    )
                 case .register:
                     RegisterView(navigateToLogin: { currentView = .login }, onRegistrationComplete: { currentView = .trialSubscription })
                 case .trialSubscription:
@@ -55,7 +78,8 @@ struct ContentView: View {
                     ProfileView(
                         navigateToHome: { currentView = .home },
                         navigateToMap: { currentView = .map },
-                        navigateToNewsFeed: { currentView = .newsFeed }
+                        navigateToNewsFeed: { currentView = .newsFeed },
+                        navigateToLogin: { currentView = .login }
                     )
                 case .newEvent:
                     NewEventView(onDismiss: { currentView = .home })
@@ -82,6 +106,12 @@ struct ContentView: View {
                 }
             }
             .navigationBarHidden(true)
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("UserDidLogout"))) { _ in
+                DispatchQueue.main.async {
+                    self.currentView = .login
+                }
+            }
+
         }
     }
 }

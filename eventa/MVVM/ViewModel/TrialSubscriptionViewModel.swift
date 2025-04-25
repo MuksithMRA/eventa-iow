@@ -1,9 +1,16 @@
 import Foundation
 import SwiftUI
 import Combine
+import os.log
+
+
 
 class TrialSubscriptionViewModel: ObservableObject {
     @Published var model: TrialSubscriptionModel
+    @Published var isLoading = false
+    @Published var errorMessage: String? = nil
+    
+    private let logger = Logger(subsystem: "com.eventa.app", category: "TrialSubscriptionViewModel")
     
     init() {
         self.model = TrialSubscriptionModel(
@@ -24,7 +31,73 @@ class TrialSubscriptionViewModel: ObservableObject {
     }
     
     func startFreeTrial() {
+        isLoading = true
+        errorMessage = nil
         
+        Task<Void, Never> {
+            do {
+                // Get auth token
+                let token = UserDefaults.standard.string(forKey: "auth_token")
+                
+                // Create API request
+                let url = URL(string: "http://localhost:5001/api/subscriptions/trial")!
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                
+                if let token = token {
+                    request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                } else {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.isLoading = false
+                        self.errorMessage = "You need to be logged in to start a trial"
+                    }
+                    return
+                }
+                
+                // Make API call
+                let (data, response) = try await URLSession.shared.data(for: request)
+                
+                // Handle response
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw NSError(domain: "SubscriptionError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid response"])
+                }
+                
+                if (200...299).contains(httpResponse.statusCode) {
+                    // Decode response
+                    let decoder = JSONDecoder()
+                    let subscriptionResponse = try decoder.decode(SubscriptionResponse.self, from: data)
+                    
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.isLoading = false
+                        
+                        if subscriptionResponse.success {
+                            if let expiryDate = subscriptionResponse.expiryDate {
+                                UserDefaults.standard.set(expiryDate, forKey: "trial_expiry_date")
+                                UserDefaults.standard.set(true, forKey: "has_active_trial")
+                            }
+                            self.logger.info("Trial subscription started successfully")
+                        } else {
+                            self.errorMessage = subscriptionResponse.message
+                            self.logger.error("Failed to start trial: \(subscriptionResponse.message)")
+                        }
+                    }
+                } else {
+                    // Handle error response
+                    throw NSError(domain: "SubscriptionError", code: httpResponse.statusCode, 
+                                  userInfo: [NSLocalizedDescriptionKey: "Server error: \(httpResponse.statusCode)"])
+                }
+            } catch {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.isLoading = false
+                    self.errorMessage = error.localizedDescription
+                    self.logger.error("Error starting trial: \(error.localizedDescription)")
+                }
+            }
+        }
     }
     
     func dismissSubscription() {
