@@ -45,7 +45,8 @@ class NewEventViewModel: ObservableObject {
             "title": formData.title,
             "description": formData.description,
             "date": dateFormatter.string(from: formData.date),
-            "time": timeFormatter.string(from: formData.startTime),
+            "starttime": timeFormatter.string(from: formData.startTime),
+            "endtime": timeFormatter.string(from: formData.endTime),
             "price": [
                 "amount": Double(formData.price) ?? 0,
                 "currency": "LKR"
@@ -141,6 +142,23 @@ class NewEventViewModel: ObservableObject {
         formData.location = name
         formData.latitude = latitude
         formData.longitude = longitude
+    }
+    
+    func setDate(_ date: Date) {
+        formData.date = date
+    }
+    
+    func setStartTime(_ time: Date) {
+        formData.startTime = time
+        
+        // If end time is before start time, adjust end time to be 1 hour after start time
+        if formData.endTime < formData.startTime {
+            formData.endTime = Calendar.current.date(byAdding: .hour, value: 1, to: formData.startTime) ?? formData.endTime
+        }
+    }
+    
+    func setEndTime(_ time: Date) {
+        formData.endTime = time
     }
     
     func selectDate() {

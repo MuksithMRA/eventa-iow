@@ -205,63 +205,107 @@ struct NewEventView: View {
     }
     
     private var dateSection: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 8) {
             Text(viewModel.model.dateText)
                 .font(.system(size: 16, weight: .medium))
             
-            Spacer()
-            
-            Button(action: {
-                viewModel.selectDate()
-            }) {
-                Text(viewModel.model.selectFromCalendarText)
-                    .font(.system(size: 16))
-                    .foregroundColor(.blue)
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(formattedDate)
+                        .font(.system(size: 16))
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    viewModel.selectDate()
+                }) {
+                    Text(viewModel.model.selectFromCalendarText)
+                        .font(.system(size: 16))
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+            .sheet(isPresented: $viewModel.showDatePicker) {
+                DatePickerView(viewModel: viewModel)
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(8)
+    }
+    
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: viewModel.formData.date)
     }
     
     private var startTimeSection: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 8) {
             Text(viewModel.model.startTimeText)
                 .font(.system(size: 16, weight: .medium))
             
-            Spacer()
-            
-            Button(action: {
-                viewModel.selectStartTime()
-            }) {
-                Text(viewModel.model.selectFromPickerText)
+            HStack {
+                Text(formattedStartTime)
                     .font(.system(size: 16))
-                    .foregroundColor(.blue)
+                
+                Spacer()
+                
+                Button(action: {
+                    viewModel.selectStartTime()
+                }) {
+                    Text(viewModel.model.selectFromPickerText)
+                        .font(.system(size: 16))
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+            .sheet(isPresented: $viewModel.showStartTimePicker) {
+                TimePickerView(viewModel: viewModel, isStartTime: true)
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(8)
+    }
+    
+    private var formattedStartTime: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: viewModel.formData.startTime)
     }
     
     private var endTimeSection: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 8) {
             Text(viewModel.model.endTimeText)
                 .font(.system(size: 16, weight: .medium))
             
-            Spacer()
-            
-            Button(action: {
-                viewModel.selectEndTime()
-            }) {
-                Text(viewModel.model.selectFromPickerText)
+            HStack {
+                Text(formattedEndTime)
                     .font(.system(size: 16))
-                    .foregroundColor(.blue)
+                
+                Spacer()
+                
+                Button(action: {
+                    viewModel.selectEndTime()
+                }) {
+                    Text(viewModel.model.selectFromPickerText)
+                        .font(.system(size: 16))
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+            .sheet(isPresented: $viewModel.showEndTimePicker) {
+                TimePickerView(viewModel: viewModel, isStartTime: false)
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(8)
+    }
+    
+    private var formattedEndTime: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: viewModel.formData.endTime)
     }
     
     private var descriptionField: some View {

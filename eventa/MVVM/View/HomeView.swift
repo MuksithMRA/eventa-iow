@@ -202,9 +202,19 @@ struct HomeView: View {
     private var featuredEventsView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
-                ForEach(viewModel.events.prefix(2)) { event in
-                    FeaturedEventCard(event: event) {
-                        navigateToEventDetails?(event)
+                if viewModel.isLoading && viewModel.featuredEvents.isEmpty {
+                    ProgressView()
+                        .frame(width: 280, height: 180)
+                } else if viewModel.featuredEvents.isEmpty {
+                    Text("No featured events available")
+                        .frame(width: 280, height: 180)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(16)
+                } else {
+                    ForEach(viewModel.featuredEvents) { event in
+                        FeaturedEventCard(event: event) {
+                            navigateToEventDetails?(event)
+                        }
                     }
                 }
             }
@@ -214,9 +224,20 @@ struct HomeView: View {
     
     private var eventsForYouView: some View {
         VStack(spacing: 16) {
-            ForEach(viewModel.events) { event in
-                EventListItem(event: event) {
-                    navigateToEventDetails?(event)
+            if viewModel.isLoading && viewModel.upcomingEvents.isEmpty {
+                ProgressView()
+                    .frame(height: 100)
+            } else if viewModel.upcomingEvents.isEmpty {
+                Text("No upcoming events available")
+                    .frame(height: 100)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(12)
+            } else {
+                ForEach(viewModel.upcomingEvents) { event in
+                    EventListItem(event: event) {
+                        navigateToEventDetails?(event)
+                    }
                 }
             }
         }

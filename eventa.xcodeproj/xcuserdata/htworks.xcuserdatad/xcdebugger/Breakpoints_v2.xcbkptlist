@@ -36,5 +36,51 @@
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B3A3E45D-0C2F-427D-BE57-839F6E7189CE"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "eventa/MVVM/ViewModel/NewEventViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
+            landmarkName = "saveEvent(completion:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "B3A3E45D-0C2F-427D-BE57-839F6E7189CE - 365f9024fd05f63f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Swift.MainActor @Sendable () -&gt; () in closure #1 () async -&gt; () in eventa.NewEventViewModel.saveEvent(completion: () -&gt; ()) -&gt; ()"
+                  moduleName = "eventa.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/htworks/repos/eventa/eventa/MVVM/ViewModel/NewEventViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "80"
+                  endingLineNumber = "80">
+               </Location>
+               <Location
+                  uuid = "B3A3E45D-0C2F-427D-BE57-839F6E7189CE - 5dc508d92f61f385"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for function signature specialization &lt;Arg[3] = Value Promoted from Box&gt; of closure #1 () async -&gt; () in eventa.NewEventViewModel.saveEvent(completion: () -&gt; ()) -&gt; ()"
+                  moduleName = "eventa.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/htworks/repos/eventa/eventa/MVVM/ViewModel/NewEventViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "80"
+                  endingLineNumber = "80">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

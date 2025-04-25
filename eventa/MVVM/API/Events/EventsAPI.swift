@@ -100,7 +100,8 @@ struct Event: Decodable, Identifiable {
     let title: String
     let description: String
     let date: String
-    let time: String
+    let starttime: String
+    let endtime: String
     let location: Location
     let price: Price
     let category: String
@@ -116,7 +117,7 @@ struct Event: Decodable, Identifiable {
     
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        case title, description, date, time, location, price, category, image, organizer, participants, likes, featured, createdAt, updatedAt, participantCount, likeCount
+        case title, description, date, starttime, endtime, location, price, category, image, organizer, participants, likes, featured, createdAt, updatedAt, participantCount, likeCount
     }
 }
 
