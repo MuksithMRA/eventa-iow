@@ -315,7 +315,7 @@ struct FeaturedEventCard: View {
                         .font(.system(size: 14))
                         .foregroundColor(.white)
                     
-                    Text(event.location)
+                    Text(event.location.address)
                         .font(.system(size: 14))
                         .foregroundColor(.white)
                 }
@@ -352,7 +352,7 @@ struct EventListItem: View {
                     .font(.system(size: 14))
                     .foregroundColor(.gray)
                 
-                Text(event.location)
+                Text(event.location.address)
                     .font(.system(size: 14))
                     .foregroundColor(.gray)
             }

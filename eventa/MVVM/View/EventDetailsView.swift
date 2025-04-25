@@ -28,6 +28,8 @@ struct EventDetailsView: View {
                         eventDescriptionView
                         
                         mapView
+                        
+                        Spacer().frame(height: 100)
                     }
                     .padding(.top, 20)
                 }
@@ -133,6 +135,12 @@ struct EventDetailsView: View {
         ZStack {
             Color.blue
             
+            Image(viewModel.model.event.image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 280)
+                .opacity(0.2)
+            
             VStack(spacing: 0) {
                 HStack {
                     Button(action: {
@@ -142,68 +150,65 @@ struct EventDetailsView: View {
                             presentationMode.wrappedValue.dismiss()
                         }
                     }) {
-                        Image(systemName: "chevron.left")
+                        Image(systemName: "arrow.left")
                             .font(.system(size: 20, weight: .medium))
                             .foregroundColor(.white)
                     }
                     
                     Spacer()
                     
-                    Button(action: {
-                        showReviews = true
-                    }) {
-                        Text(viewModel.model.reviewsButtonText)
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color.white)
-                            .cornerRadius(20)
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Button(action: {
+                            showReviews = true
+                        }) {
+                            Text("Reviews")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.blue)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Color.white)
+                                .cornerRadius(20)
+                        }
                     }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
                 
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 4) {
+                Spacer()
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    if !viewModel.isLoading {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(viewModel.model.event.day)
-                                .font(.system(size: 24, weight: .bold))
+                                .font(.system(size: 32))
                                 .foregroundColor(.white)
                             
                             Text(viewModel.model.event.month)
-                                .font(.system(size: 16))
+                                .font(.system(size: 32))
                                 .foregroundColor(.white)
                         }
+                        .padding(.bottom, 12)
                         
-                        Spacer()
+                        Text(viewModel.model.event.title)
+                            .font(.system(size: 30))
+                            .foregroundColor(.white)
+                            .padding(.bottom, 12)
                         
-                        if !viewModel.model.event.image.isEmpty {
-                            Image(viewModel.model.event.image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 120, height: 120)
-                        }
-                    }
-                    
-                    Text(viewModel.model.event.title)
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
-                    
-                    Text("LKR 1000")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-                    
-                    Button(action: {
-                        viewModel.openMap()
-                    }) {
+                        Text("LKR \(String(format: "%.0f", viewModel.model.event.price))")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                            .padding(.bottom, 16)
+                        
                         HStack(spacing: 8) {
-                            Image(systemName: "location.fill")
-                                .font(.system(size: 16))
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.system(size: 20))
                                 .foregroundColor(.white)
                             
-                            Text(viewModel.model.event.location)
-                                .font(.system(size: 16))
+                            Text(viewModel.model.event.location.address)
+                                .font(.system(size: 18))
                                 .foregroundColor(.white)
                             
                             Spacer()
@@ -211,7 +216,6 @@ struct EventDetailsView: View {
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 16)
                 .padding(.bottom, 24)
             }
         }
@@ -225,91 +229,141 @@ struct EventDetailsView: View {
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.black)
                 .padding(.horizontal, 16)
-                
-            Text("Join top cybersecurity experts at CyberShield 2025, the ultimate conference on threat intelligence, ethical hacking, and AI-driven security. Explore live hacking demos, hands-on workshops, and keynote sessions from industry leaders. Whether you're a pro or just starting, this event equips you with the latest tools to defend against cyber threats.")
-                .font(.system(size: 16))
-                .foregroundColor(.black.opacity(0.7))
-                .lineSpacing(4)
-                .padding(.horizontal, 16)
+            
+            if viewModel.isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .padding(.vertical, 20)
+            } else if !viewModel.model.event.description.isEmpty {
+                Text(viewModel.model.event.description)
+                    .font(.system(size: 16))
+                    .foregroundColor(.black.opacity(0.7))
+                    .lineSpacing(4)
+                    .padding(.horizontal, 16)
+            } else {
+                Text("No description ...")
+                    .font(.system(size: 16))
+                    .foregroundColor(.black.opacity(0.7))
+                    .lineSpacing(4)
+                    .padding(.horizontal, 16)
+            }
         }
         .padding(.vertical, 16)
     }
     
     private var mapView: some View {
         VStack {
-            Map(initialPosition: .region(MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 6.9271, longitude: 79.8612),
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-            ))) {
-                Marker("Event Location", coordinate: CLLocationCoordinate2D(latitude: 6.9271, longitude: 79.8612))
+            if viewModel.isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .frame(height: 180)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(12)
+                .padding(.horizontal, 16)
+            } else {
+                Map(initialPosition: .region(viewModel.region), content: {
+                    let event = viewModel.model.event
+                    let coordinates = event.location.coordinates
+                    
+                    Marker(event.location.address, coordinate: CLLocationCoordinate2D(
+                        latitude: coordinates.latitude,
+                        longitude: coordinates.longitude
+                    ))
                     .tint(.blue)
+                })
+                .frame(height: 180)
+                .cornerRadius(12)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 30)
             }
-            .frame(height: 180)
-            .cornerRadius(12)
-            .padding(.horizontal, 16)
         }
     }
     
     private var participantsView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 0) {
-                Image("profile")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 32, height: 32)
-                    .clipShape(Circle())
-                
-                Image("profile")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 32, height: 32)
-                    .clipShape(Circle())
-                    .offset(x: -10)
-                
-                Image("profile")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 32, height: 32)
-                    .clipShape(Circle())
-                    .offset(x: -20)
-                
-                Text("\(viewModel.participantCount) others joined")
-                    .font(.system(size: 14))
-                    .foregroundColor(.black.opacity(0.7))
-                    .padding(.leading, 8)
-                
-                Spacer()
-                
-                Button(action: {
-                    viewModel.isJoined.toggle()
-                }) {
-                    Image(systemName: viewModel.isJoined ? "heart.fill" : "heart")
-                        .font(.system(size: 24))
-                        .foregroundColor(viewModel.isJoined ? .red : .black)
+            if viewModel.isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
                 }
+                .padding(.vertical, 16)
+            } else {
+                HStack(spacing: 0) {
+                    Image("profile")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 32, height: 32)
+                        .clipShape(Circle())
+                    
+                    Image("profile")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 32, height: 32)
+                        .clipShape(Circle())
+                        .offset(x: -10)
+                    
+                    Image("profile")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 32, height: 32)
+                        .clipShape(Circle())
+                        .offset(x: -20)
+                    
+                    Text("\(viewModel.participantCount) others joined")
+                        .font(.system(size: 14))
+                        .foregroundColor(.black.opacity(0.7))
+                        .padding(.leading, 8)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        viewModel.isJoined.toggle()
+                    }) {
+                        Image(systemName: viewModel.isJoined ? "heart.fill" : "heart")
+                            .font(.system(size: 24))
+                            .foregroundColor(viewModel.isJoined ? .red : .black)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
         }
     }
     
     private var joinButtonView: some View {
         VStack {
-            Button(action: {
-                viewModel.joinEvent()
-                if let navigateToTicketPurchase = navigateToTicketPurchase {
-                    navigateToTicketPurchase()
-                }
-            }) {
-                Text(viewModel.model.joinButtonText)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.blue)
-                    .cornerRadius(12)
-                    .padding(.horizontal, 16)
+            if viewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                     .padding(.bottom, 32)
+            } else {
+                Button(action: {
+                    if viewModel.isJoined {
+                        viewModel.leaveEvent()
+                    } else {
+                        viewModel.joinEvent()
+                        if let navigateToTicketPurchase = navigateToTicketPurchase {
+                            navigateToTicketPurchase()
+                        }
+                    }
+                }) {
+                    Text(viewModel.isJoined ? "Leave Event" : viewModel.model.joinButtonText)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(viewModel.isJoined ? Color.red : Color.blue)
+                        .cornerRadius(12)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 32)
+                }
             }
         }
         .background(Color.white)

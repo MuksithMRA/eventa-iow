@@ -114,7 +114,7 @@ struct TicketPurchaseView: View {
                     Text(viewModel.model.event.title)
                         .font(.system(size: 16, weight: .bold))
                     
-                    Text("\(viewModel.model.event.location), \(viewModel.model.event.city)")
+                    Text("\(viewModel.model.event.location.address), \(viewModel.model.event.location.city)")
                         .font(.system(size: 14))
                         .foregroundColor(.black.opacity(0.7))
                     

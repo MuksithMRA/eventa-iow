@@ -73,14 +73,14 @@ class HomeViewModel: ObservableObject {
                 date: date,
                 month: month,
                 day: day,
-                location: event.location.address,
-                city: event.location.city,
+                location: event.location,
                 image: event.image.isEmpty ? "event1" : event.image,
                 color: event.featured ? .blue : .gray,
                 joinButtonText: "Join",
                 timeRange: event.starttime + " - " + event.endtime,
                 price: event.price.amount,
-                isJoined: false
+                isJoined: false,
+                description: ""
             )
         }
     }

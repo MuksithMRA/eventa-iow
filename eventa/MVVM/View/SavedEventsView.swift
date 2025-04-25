@@ -161,7 +161,7 @@ struct SavedEventsView: View {
                                 .font(.system(size: 14))
                                 .foregroundColor(.white)
                             
-                            Text(event.location)
+                            Text(event.location.address)
                                 .font(.system(size: 14))
                                 .foregroundColor(.white)
                         }
@@ -254,7 +254,7 @@ struct SavedEventsView: View {
                                 .font(.system(size: 14))
                                 .foregroundColor(.white)
                             
-                            Text(event.location)
+                            Text(event.location.address)
                                 .font(.system(size: 14))
                                 .foregroundColor(.white)
                         }
