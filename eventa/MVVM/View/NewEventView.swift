@@ -1,14 +1,17 @@
 import SwiftUI
+import Combine
+import MapKit
 
 struct NewEventView: View {
     @StateObject private var viewModel = NewEventViewModel()
     var onDismiss: () -> Void
     
     var body: some View {
-        VStack(spacing: 0) {
-            headerView
-            
-            ScrollView {
+        ZStack {
+            VStack(spacing: 0) {
+                headerView
+                
+                ScrollView {
                 VStack(spacing: 24) {
                     titleField
                     
@@ -33,8 +36,18 @@ struct NewEventView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 24)
             }
+            }
+            .background(Color.gray.opacity(0.1).ignoresSafeArea())
+            .disabled(viewModel.isLoading)
+            
+            if viewModel.isLoading {
+                loadingView
+            }
+            
+            if let errorMessage = viewModel.errorMessage {
+                errorView(message: errorMessage)
+            }
         }
-        .background(Color.gray.opacity(0.1).ignoresSafeArea())
     }
     
     private var headerView: some View {
@@ -67,6 +80,7 @@ struct NewEventView: View {
                     .background(Color.blue)
                     .cornerRadius(8)
             }
+            .disabled(viewModel.isLoading)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
@@ -143,23 +157,51 @@ struct NewEventView: View {
     }
     
     private var locationSection: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 8) {
             Text(viewModel.model.locationText)
                 .font(.system(size: 16, weight: .medium))
             
-            Spacer()
-            
-            Button(action: {
-                viewModel.selectLocation()
-            }) {
-                Text(viewModel.model.selectFromMapText)
-                    .font(.system(size: 16))
-                    .foregroundColor(.blue)
+            if viewModel.formData.isOffline {
+                HStack {
+                    if viewModel.formData.location.isEmpty {
+                        Text("No location selected")
+                            .foregroundColor(.gray)
+                    } else {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(viewModel.formData.location)
+                                .font(.system(size: 14))
+                            
+                            Text("Lat: \(String(format: "%.4f", viewModel.formData.latitude)), Long: \(String(format: "%.4f", viewModel.formData.longitude))")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        viewModel.selectLocation()
+                    }) {
+                        Text(viewModel.model.selectFromMapText)
+                            .font(.system(size: 16))
+                            .foregroundColor(.blue)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+                .sheet(isPresented: $viewModel.showLocationPicker) {
+                    MapLocationPickerView(viewModel: viewModel)
+                }
+            } else {
+                TextField("Enter meeting link", text: $viewModel.formData.meetingLink)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .autocapitalization(.none)
+                    .keyboardType(.URL)
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(8)
     }
     
     private var dateSection: some View {
@@ -276,6 +318,57 @@ struct NewEventView: View {
             .padding(.vertical, 16)
             .background(Color.white)
             .cornerRadius(8)
+        }
+    }
+    
+    private var loadingView: some View {
+        ZStack {
+            Color.black.opacity(0.4)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 16) {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.5)
+                
+                Text("Creating Event...")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .padding(24)
+            .background(Color.gray.opacity(0.8))
+            .cornerRadius(12)
+        }
+    }
+    
+    private func errorView(message: String) -> some View {
+        VStack {
+            Spacer()
+            
+            HStack {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.white)
+                
+                Text(message)
+                    .font(.system(size: 14))
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Button(action: {
+                    viewModel.errorMessage = nil
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.white)
+                }
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+            .background(Color.red)
+            .cornerRadius(8)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
         }
     }
 }

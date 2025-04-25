@@ -25,6 +25,9 @@ struct EventFormData {
     var title: String = ""
     var description: String = ""
     var location: String = ""
+    var latitude: Double = 0.0
+    var longitude: Double = 0.0
+    var meetingLink: String = ""
     var date: Date = Date()
     var startTime: Date = Date()
     var endTime: Date = Date(timeIntervalSinceNow: 3600)
