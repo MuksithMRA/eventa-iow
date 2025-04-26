@@ -1,5 +1,5 @@
-import SwiftUI
 import MapKit
+import SwiftUI
 
 struct EventDetailsView: View {
     @StateObject private var viewModel: EventDetailsViewModel
@@ -8,13 +8,16 @@ struct EventDetailsView: View {
     @State private var selectedReviewType: ReviewType = .positive
     var navigateToHome: (() -> Void)?
     var navigateToTicketPurchase: (() -> Void)?
-    
-    init(event: EventItem, navigateToHome: (() -> Void)? = nil, navigateToTicketPurchase: (() -> Void)? = nil) {
+
+    init(
+        event: EventItem, navigateToHome: (() -> Void)? = nil,
+        navigateToTicketPurchase: (() -> Void)? = nil
+    ) {
         _viewModel = StateObject(wrappedValue: EventDetailsViewModel(event: event))
         self.navigateToHome = navigateToHome
         self.navigateToTicketPurchase = navigateToTicketPurchase
     }
-    
+
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
@@ -22,125 +25,38 @@ struct EventDetailsView: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         Spacer().frame(height: 30)
-                        
+
                         participantsView
-                        
+
                         eventDescriptionView
-                        
+
                         mapView
-                        
+
                         Spacer().frame(height: 100)
                     }
                     .padding(.top, 20)
                 }
             }
-            
+
             joinButtonView
         }
         .edgesIgnoringSafeArea(.bottom)
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showReviews) {
-            
-            VStack(alignment: .leading, spacing: 20) {
-                HStack {
-                    Text("Reviews")
-                        .font(.system(size: 20, weight: .bold))
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        showReviews = false
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 16))
-                            .foregroundColor(.black)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                
-                HStack(spacing: 16) {
-                    Button(action: {
-                        selectedReviewType = .positive
-                    }) {
-                        Text("Postive")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(selectedReviewType == .positive ? .white : .blue)
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 12)
-                            .background(selectedReviewType == .positive ? Color.blue : Color.blue.opacity(0.1))
-                            .cornerRadius(20)
-                    }
-                    
-                    Button(action: {
-                        selectedReviewType = .negative
-                    }) {
-                        Text("Negative")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(selectedReviewType == .negative ? .white : .black)
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 12)
-                            .background(selectedReviewType == .negative ? Color.black : Color.gray.opacity(0.1))
-                            .cornerRadius(20)
-                    }
-                }
-                .padding(.horizontal, 20)
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        ForEach(0..<3) { _ in
-                            
-                            VStack(alignment: .leading, spacing: 12) {
-                                HStack(spacing: 12) {
-                                    Image("profile")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 40, height: 40)
-                                        .clipShape(Circle())
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Jake Willson")
-                                            .font(.system(size: 16, weight: .medium))
-                                        
-                                        Text("Cyber Security enthusiast")
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                                
-                                Text("A must-attend for cybersecurity pros!")
-                                    .font(.system(size: 16, weight: .medium))
-                                
-                                Text("This was an incredible experience! The live hacking demos were eye-opening, and the expert panels provided real-world insights. Can't wait for next year!")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.black.opacity(0.7))
-                                    .lineSpacing(4)
-                            }
-                            .padding(16)
-                            .background(Color.gray.opacity(0.05))
-                            .cornerRadius(12)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
-                }
-            }
-            .background(Color.white)
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
+            EventReviewsView(isPresented: $showReviews, viewModel: viewModel)
         }
     }
-    
+
     private var headerView: some View {
         ZStack {
             Color.blue
-            
+
             Image(viewModel.model.event.image)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(height: 280)
                 .opacity(0.2)
-            
+
             VStack(spacing: 0) {
                 HStack {
                     Button(action: {
@@ -154,9 +70,9 @@ struct EventDetailsView: View {
                             .font(.system(size: 20, weight: .medium))
                             .foregroundColor(.white)
                     }
-                    
+
                     Spacer()
-                    
+
                     if viewModel.isLoading {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -176,41 +92,41 @@ struct EventDetailsView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
-                
+
                 Spacer()
-                
+
                 VStack(alignment: .leading, spacing: 8) {
                     if !viewModel.isLoading {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(viewModel.model.event.day)
                                 .font(.system(size: 32))
                                 .foregroundColor(.white)
-                            
+
                             Text(viewModel.model.event.month)
                                 .font(.system(size: 32))
                                 .foregroundColor(.white)
                         }
                         .padding(.bottom, 12)
-                        
+
                         Text(viewModel.model.event.title)
                             .font(.system(size: 30))
                             .foregroundColor(.white)
                             .padding(.bottom, 12)
-                        
+
                         Text("LKR \(String(format: "%.0f", viewModel.model.event.price))")
                             .font(.system(size: 24))
                             .foregroundColor(.white)
                             .padding(.bottom, 16)
-                        
+
                         HStack(spacing: 8) {
                             Image(systemName: "mappin.circle.fill")
                                 .font(.system(size: 20))
                                 .foregroundColor(.white)
-                            
+
                             Text(viewModel.model.event.location.address)
                                 .font(.system(size: 18))
                                 .foregroundColor(.white)
-                            
+
                             Spacer()
                         }
                     }
@@ -220,7 +136,7 @@ struct EventDetailsView: View {
             }
         }
         .frame(height: 280)
-        .zIndex(1) 
+        .zIndex(1)
     }
 
     private var eventDescriptionView: some View {
@@ -229,7 +145,7 @@ struct EventDetailsView: View {
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.black)
                 .padding(.horizontal, 16)
-            
+
             if viewModel.isLoading {
                 HStack {
                     Spacer()
@@ -253,8 +169,8 @@ struct EventDetailsView: View {
         }
         .padding(.vertical, 16)
     }
-    
-    private var mapView: some View {
+
+    var mapView: some View {
         VStack {
             if viewModel.isLoading {
                 HStack {
@@ -267,16 +183,22 @@ struct EventDetailsView: View {
                 .cornerRadius(12)
                 .padding(.horizontal, 16)
             } else {
-                Map(initialPosition: .region(viewModel.region), content: {
-                    let event = viewModel.model.event
-                    let coordinates = event.location.coordinates
-                    
-                    Marker(event.location.address, coordinate: CLLocationCoordinate2D(
-                        latitude: coordinates.latitude,
-                        longitude: coordinates.longitude
-                    ))
-                    .tint(.blue)
-                })
+                Map(
+                    initialPosition: .region(viewModel.region),
+                    content: {
+                        let event = viewModel.model.event
+                        let coordinates = event.location.coordinates
+
+                        Marker(
+                            event.location.address,
+                            coordinate: CLLocationCoordinate2D(
+                                latitude: coordinates.latitude,
+                                longitude: coordinates.longitude
+                            )
+                        )
+                        .tint(.blue)
+                    }
+                )
                 .frame(height: 180)
                 .cornerRadius(12)
                 .padding(.horizontal, 16)
@@ -284,7 +206,7 @@ struct EventDetailsView: View {
             }
         }
     }
-    
+
     private var participantsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             if viewModel.isLoading {
@@ -301,28 +223,28 @@ struct EventDetailsView: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 32, height: 32)
                         .clipShape(Circle())
-                    
+
                     Image("profile")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 32, height: 32)
                         .clipShape(Circle())
                         .offset(x: -10)
-                    
+
                     Image("profile")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 32, height: 32)
                         .clipShape(Circle())
                         .offset(x: -20)
-                    
+
                     Text("\(viewModel.participantCount) others joined")
                         .font(.system(size: 14))
                         .foregroundColor(.black.opacity(0.7))
                         .padding(.leading, 8)
-                    
+
                     Spacer()
-                    
+
                     Button(action: {
                         viewModel.isJoined.toggle()
                     }) {
@@ -336,12 +258,14 @@ struct EventDetailsView: View {
             }
         }
     }
-    
-    private var joinButtonView: some View {
+
+   private var joinButtonView: some View {
         VStack {
             if viewModel.isLoading {
+                // Break up the complex expression into smaller parts
+                let progressStyle = CircularProgressViewStyle(tint: .blue)
                 ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                    .progressViewStyle(progressStyle)
                     .padding(.bottom, 32)
             } else {
                 Button(action: {

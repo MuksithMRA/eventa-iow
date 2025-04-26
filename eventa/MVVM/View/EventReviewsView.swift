@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EventReviewsView: View {
     @Binding var isPresented: Bool
+    @ObservedObject var viewModel: EventDetailsViewModel
     @State private var selectedReviewType: ReviewType = .positive
     
     var body: some View {
@@ -26,8 +27,9 @@ struct EventReviewsView: View {
             HStack(spacing: 16) {
                 Button(action: {
                     selectedReviewType = .positive
+                    viewModel.loadReviews(type: .positive)
                 }) {
-                    Text("Postive")
+                    Text("Positive")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(selectedReviewType == .positive ? .white : .blue)
                         .padding(.horizontal, 24)
@@ -38,6 +40,7 @@ struct EventReviewsView: View {
                 
                 Button(action: {
                     selectedReviewType = .negative
+                    viewModel.loadReviews(type: .negative)
                 }) {
                     Text("Negative")
                         .font(.system(size: 16, weight: .medium))
@@ -50,53 +53,98 @@ struct EventReviewsView: View {
             }
             .padding(.horizontal, 20)
             
-            ScrollView {
-                VStack(spacing: 24) {
-                    ForEach(0..<3) { _ in
-                        reviewCard
+            VStack(spacing: 16) {
+                TextField("Write your review...", text: $viewModel.reviewContent)
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
+
+                HStack {
+                    Text("Rating:")
+                        .font(.system(size: 16))
+
+                    Picker("Rating", selection: $viewModel.reviewRating) {
+                        ForEach(1...5, id: \.self) { rating in
+                            Text("\(rating)")
+                        }
                     }
+                    .pickerStyle(SegmentedPickerStyle())
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
+
+                Button(action: {
+                    viewModel.submitReview()
+                }) {
+                    Text("Submit Review")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            
+            if viewModel.isLoadingReviews {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .padding(.vertical, 20)
+            } else {
+                ScrollView {
+                    VStack(spacing: 24) {
+                        ForEach(viewModel.reviews) { review in
+                            reviewCard(review: review)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+                }
             }
         }
         .background(Color.white)
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
     
-    private var reviewCard: some View {
+    private func reviewCard(review: Review) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
-                Image("profile")
+                Image(review.userImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Jake Willson")
+                    Text(review.userName)
                         .font(.system(size: 16, weight: .medium))
                     
-                    Text("Cyber Security enthusiast")
-                        .font(.system(size: 14))
-                        .foregroundColor(.gray)
+                    HStack(spacing: 4) {
+                        ForEach(0..<5) { index in
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(index < review.rating ? .yellow : .gray)
+                        }
+                        
+                        Text(review.date)
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                            .padding(.leading, 8)
+                    }
                 }
             }
             
-            Text("A must-attend for cybersecurity pros!")
-                .font(.system(size: 16, weight: .medium))
-            
-            Text("This was an incredible experience! The live hacking demos were eye-opening, and the expert panels provided real-world insights. Can't wait for next year!")
+            Text(review.content)
                 .font(.system(size: 14))
-                .foregroundColor(.black.opacity(0.7))
+                .foregroundColor(.black.opacity(0.8))
                 .lineSpacing(4)
         }
         .padding(16)
         .background(Color.gray.opacity(0.05))
         .cornerRadius(12)
     }
-}
-
-enum ReviewType {
-    case positive
-    case negative
 }

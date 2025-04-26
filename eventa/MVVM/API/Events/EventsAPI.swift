@@ -1,4 +1,6 @@
 import Foundation
+import SwiftUI
+import CoreLocation
 
 struct EventsAPI {
     static let shared = EventsAPI()
@@ -67,6 +69,45 @@ struct EventsAPI {
             token: token
         )
     }
+    
+    // MARK: - Reviews
+    
+    func getEventReviews(token: String, eventId: String, type: String? = nil) async throws -> ReviewsResponse {
+        var endpoint = "/events/\(eventId)/reviews"
+        if let type = type {
+            endpoint += "?type=\(type)"
+        }
+        return try await APIClient.shared.request(
+            endpoint: endpoint,
+            token: token
+        )
+    }
+    
+    func createReview(token: String, eventId: String, reviewData: [String: Any]) async throws -> ReviewResponse {
+        return try await APIClient.shared.request(
+            endpoint: "/events/\(eventId)/reviews",
+            method: .post,
+            body: reviewData,
+            token: token
+        )
+    }
+    
+    func updateReview(token: String, eventId: String, reviewId: String, reviewData: [String: Any]) async throws -> ReviewResponse {
+        return try await APIClient.shared.request(
+            endpoint: "/events/\(eventId)/reviews/\(reviewId)",
+            method: .patch,
+            body: reviewData,
+            token: token
+        )
+    }
+    
+    func deleteReview(token: String, eventId: String, reviewId: String) async throws -> EmptyResponse {
+        return try await APIClient.shared.request(
+            endpoint: "/events/\(eventId)/reviews/\(reviewId)",
+            method: .delete,
+            token: token
+        )
+    }
 }
 
 struct EventsResponse: Decodable {
@@ -94,6 +135,58 @@ struct EmptyResponse: Decodable {
 }
 
 struct EmptyData: Decodable {}
+
+// MARK: - Review Response Types
+
+struct ReviewsResponse: Decodable {
+    let status: String
+    let results: Int
+    let data: ReviewsData
+}
+
+struct ReviewResponse: Decodable {
+    let status: String
+    let data: ReviewData
+}
+
+struct ReviewsData: Decodable {
+    let reviews: [ReviewItem]
+}
+
+struct ReviewData: Decodable {
+    let review: ReviewItem
+}
+
+struct ReviewItem: Decodable, Identifiable {
+    let id: String
+    let content: String
+    let rating: Int
+    let type: String
+    let event: String
+    let user: ReviewUser
+    let createdAt: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case content, rating, type, event, user, createdAt
+    }
+}
+
+struct ReviewUser: Decodable, Identifiable {
+    let id: String
+    let firstName: String
+    let lastName: String
+    let profileImage: String
+    
+    var fullName: String {
+        return "\(firstName) \(lastName)"
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case firstName, lastName, profileImage
+    }
+}
 
 struct Event: Decodable, Identifiable {
     let id: String

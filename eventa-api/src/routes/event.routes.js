@@ -1,6 +1,7 @@
 const express = require('express');
 const eventController = require('../controllers/event.controller');
 const authMiddleware = require('../middleware/auth.middleware');
+const reviewRouter = require('./review.routes');
 
 const router = express.Router();
 
@@ -15,5 +16,7 @@ router.delete('/:id', eventController.deleteEvent);
 router.patch('/:id/join', eventController.joinEvent);
 router.patch('/:id/leave', eventController.leaveEvent);
 router.patch('/:id/like', eventController.likeEvent);
+
+router.use('/:eventId/reviews', reviewRouter);
 
 module.exports = router;
