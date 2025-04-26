@@ -40,7 +40,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "B3A3E45D-0C2F-427D-BE57-839F6E7189CE"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "eventa/MVVM/ViewModel/NewEventViewModel.swift"
@@ -50,36 +50,6 @@
             endingLineNumber = "80"
             landmarkName = "saveEvent(completion:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "B3A3E45D-0C2F-427D-BE57-839F6E7189CE - 365f9024fd05f63f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 @Swift.MainActor @Sendable () -&gt; () in closure #1 () async -&gt; () in eventa.NewEventViewModel.saveEvent(completion: () -&gt; ()) -&gt; ()"
-                  moduleName = "eventa.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/htworks/repos/eventa/eventa/MVVM/ViewModel/NewEventViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "80"
-                  endingLineNumber = "80">
-               </Location>
-               <Location
-                  uuid = "B3A3E45D-0C2F-427D-BE57-839F6E7189CE - 5dc508d92f61f385"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for function signature specialization &lt;Arg[3] = Value Promoted from Box&gt; of closure #1 () async -&gt; () in eventa.NewEventViewModel.saveEvent(completion: () -&gt; ()) -&gt; ()"
-                  moduleName = "eventa.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/htworks/repos/eventa/eventa/MVVM/ViewModel/NewEventViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "80"
-                  endingLineNumber = "80">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -92,9 +62,9 @@
             filePath = "eventa/MVVM/View/EventDetailsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "173"
-            endingLineNumber = "173"
-            landmarkName = "mapView"
+            startingLineNumber = "176"
+            endingLineNumber = "176"
+            landmarkName = "eventDescriptionView"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
@@ -111,6 +81,38 @@
             startingLineNumber = "18"
             endingLineNumber = "18"
             landmarkName = "init(event:navigateToHome:navigateToTicketPurchase:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BA3E9186-4B00-4330-B6F2-2424B7C56F9A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "eventa/MVVM/API/Events/EventsAPI.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "16"
+            endingLineNumber = "16"
+            landmarkName = "getFeaturedEvents(token:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "752D7158-9574-4006-89ED-F8165E40A5FB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "eventa/MVVM/API/Events/EventsAPI.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
+            landmarkName = "getEventById(id:token:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

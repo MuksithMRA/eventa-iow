@@ -195,7 +195,7 @@ struct PostCard: View {
                         Image(imageName)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .frame(height: 180)
+                            .frame(width: 300,height: 180)
                             .clipped()
                             .cornerRadius(8)
                     }

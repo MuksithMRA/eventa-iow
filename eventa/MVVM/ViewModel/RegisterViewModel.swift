@@ -214,7 +214,6 @@ class RegisterViewModel: ObservableObject {
     }
     
     private func validateRegistration() -> Bool {
-        // Validate all steps before final submission
         if !validatePersonalDetails() {
             currentStep = 0
             return false

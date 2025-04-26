@@ -52,6 +52,29 @@ const eventSchema = new mongoose.Schema({
       default: 'LKR'
     }
   },
+  tickets: [{
+    name: {
+      type: String,
+      required: [true, 'Ticket name is required']
+    },
+    description: {
+      type: String
+    },
+    price: {
+      amount: {
+        type: Number,
+        required: [true, 'Ticket price amount is required']
+      },
+      currency: {
+        type: String,
+        default: 'LKR'
+      }
+    },
+    quantity: {
+      type: Number,
+      default: -1 // -1 means unlimited
+    }
+  }],
   category: {
     type: String,
     required: [true, 'Event category is required'],

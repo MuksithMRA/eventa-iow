@@ -28,19 +28,28 @@ struct HomeView: View {
                 VStack(spacing: 24) {
                     actionButtonsView
                     
-                    featuredEventsView
-                    
-                    Text(viewModel.model.eventsForYouTitle)
-                        .font(.system(size: 18, weight: .bold))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
-                    
-                    eventsForYouView
+                    if !viewModel.searchQuery.isEmpty {
+                        searchResultsView
+                    } else {
+                        featuredEventsView
+                        
+                        Text(viewModel.model.eventsForYouTitle)
+                            .font(.system(size: 18, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 16)
+                        
+                        eventsForYouView
+                    }
                 }
                 .padding(.bottom, 16)
             }
             
             bottomTabBar
+        }
+        .onChange(of: viewModel.searchQuery) { newValue in
+            if !newValue.isEmpty {
+                viewModel.searchEvents(query: newValue)
+            }
         }
     }
     
@@ -84,11 +93,22 @@ struct HomeView: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
                     
-                    Text(viewModel.model.searchPlaceholder)
+                    TextField(viewModel.model.searchPlaceholder, text: $viewModel.searchQuery)
                         .font(.system(size: 16))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.black)
+                        .onSubmit {
+                            viewModel.searchEvents(query: viewModel.searchQuery)
+                        }
                     
-                    Spacer()
+                    if !viewModel.searchQuery.isEmpty {
+                        Button(action: {
+                            viewModel.searchQuery = ""
+                            viewModel.searchResults = []
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
+                        }
+                    }
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
@@ -228,11 +248,8 @@ struct HomeView: View {
                 ProgressView()
                     .frame(height: 100)
             } else if viewModel.upcomingEvents.isEmpty {
-                Text("No upcoming events available")
+                Text("No events found")
                     .frame(height: 100)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
             } else {
                 ForEach(viewModel.upcomingEvents) { event in
                     EventListItem(event: event) {
@@ -242,6 +259,31 @@ struct HomeView: View {
             }
         }
         .padding(.horizontal, 16)
+    }
+    
+    private var searchResultsView: some View {
+        VStack(spacing: 16) {
+            Text("Search Results")
+                .font(.system(size: 18, weight: .bold))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+            
+            if viewModel.isSearching {
+                ProgressView()
+                    .frame(height: 100)
+            } else if viewModel.searchResults.isEmpty {
+                Text("No results found")
+                    .frame(height: 100)
+                    .padding(.horizontal, 16)
+            } else {
+                ForEach(viewModel.searchResults) { event in
+                    EventListItem(event: event) {
+                        navigateToEventDetails?(event)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
     }
     
     private var bottomTabBar: some View {

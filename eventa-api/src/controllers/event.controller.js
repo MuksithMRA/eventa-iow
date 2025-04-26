@@ -257,6 +257,42 @@ exports.leaveEvent = async (req, res) => {
   }
 };
 
+exports.searchEvents = async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Search query is required'
+      });
+    }
+    
+    const events = await Event.find({
+      $or: [
+        { title: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } },
+        { 'location.address': { $regex: query, $options: 'i' } },
+        { 'location.city': { $regex: query, $options: 'i' } },
+        { category: { $regex: query, $options: 'i' } }
+      ]
+    });
+    
+    res.status(200).json({
+      status: 'success',
+      results: events.length,
+      data: {
+        events
+      }
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error.message
+    });
+  }
+};
+
 exports.likeEvent = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);

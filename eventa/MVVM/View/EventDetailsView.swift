@@ -113,8 +113,8 @@ struct EventDetailsView: View {
                             .font(.system(size: 30))
                             .foregroundColor(.white)
                             .padding(.bottom, 12)
-
-                        Text("LKR \(String(format: "%.0f", viewModel.model.event.price))")
+                        
+                        Text(viewModel.model.event.price == 0 ? "Free":"LKR \(String(format: "%.0f", viewModel.model.event.price))")
                             .font(.system(size: 24))
                             .foregroundColor(.white)
                             .padding(.bottom, 16)
@@ -146,7 +146,7 @@ struct EventDetailsView: View {
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.black)
                 .padding(.horizontal, 16)
-
+            
             if viewModel.isLoading {
                 HStack {
                     Spacer()
@@ -154,18 +154,22 @@ struct EventDetailsView: View {
                     Spacer()
                 }
                 .padding(.vertical, 20)
-            } else if !viewModel.model.event.description.isEmpty {
-                Text(viewModel.model.event.description)
-                    .font(.system(size: 16))
-                    .foregroundColor(.black.opacity(0.7))
-                    .lineSpacing(4)
-                    .padding(.horizontal, 16)
-            } else {
+            } else if viewModel.model.event.description.isEmpty {
                 Text("No description ...")
                     .font(.system(size: 16))
                     .foregroundColor(.black.opacity(0.7))
                     .lineSpacing(4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+            } else {
+                Text(viewModel.model.event.description)
+                    .font(.system(size: 16))
+                    .foregroundColor(.black.opacity(0.7))
+                    .lineSpacing(4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
             }
         }
         .padding(.vertical, 16)
@@ -263,7 +267,6 @@ struct EventDetailsView: View {
    private var joinButtonView: some View {
         VStack {
             if viewModel.isLoading {
-                // Break up the complex expression into smaller parts
                 let progressStyle = CircularProgressViewStyle(tint: .blue)
                 ProgressView()
                     .progressViewStyle(progressStyle)

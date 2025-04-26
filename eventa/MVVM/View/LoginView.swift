@@ -116,8 +116,8 @@ struct LoginView: View {
                     .padding(.top, 10)
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 40)
+            .padding(.horizontal, 50)
+            .padding(.vertical, 40)
             
             Spacer()
             
@@ -139,6 +139,9 @@ struct LoginView: View {
             
             if isInitialLoad {
                 isInitialLoad = false
+                if viewModel.canUseBiometrics() {
+                    viewModel.biometricLogin()
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("UserDidLogin"))) { _ in

@@ -72,11 +72,22 @@ struct MapView: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
                     
-                    Text(viewModel.model.searchPlaceholder)
+                    TextField(viewModel.model.searchPlaceholder, text: $viewModel.searchQuery)
                         .font(.system(size: 16))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.black)
+                        .onSubmit {
+                            viewModel.searchEventsOnMap(query: viewModel.searchQuery)
+                        }
                     
-                    Spacer()
+                    if !viewModel.searchQuery.isEmpty {
+                        Button(action: {
+                            viewModel.searchQuery = ""
+                            viewModel.fetchEvents()
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
+                        }
+                    }
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
@@ -109,11 +120,32 @@ struct MapView: View {
                 }
             }
             .edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        viewModel.fetchEvents()
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 16))
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .background(Color.blue)
+                            .clipShape(Circle())
+                            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    }
+                    .padding(.trailing, 16)
+                    .padding(.top, 16)
+                }
+                
+                Spacer()
+            }
 
             Color.clear
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    
                     if viewModel.showEventDetails {
                         viewModel.closeEventDetails()
                     }
@@ -122,20 +154,36 @@ struct MapView: View {
     }
     
     private var nearbyEventsView: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 16) {
-                ForEach(viewModel.model.eventLocations) { event in
-                    EventCardMap(event: event) {
-                        viewModel.viewEventDetails(event)
+        VStack {
+            if viewModel.isLoading && viewModel.model.eventLocations.isEmpty {
+                ProgressView()
+                    .frame(height: 100)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white)
+                    .cornerRadius(16)
+            } else if viewModel.model.eventLocations.isEmpty {
+                Text("No events found in this area")
+                    .frame(height: 100)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white)
+                    .cornerRadius(16)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(viewModel.model.eventLocations) { event in
+                            EventCardMap(event: event) {
+                                viewModel.viewEventDetails(event)
+                            }
+                        }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 16)
                 }
+                .background(Color.white)
+                .cornerRadius(16)
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: -5)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
         }
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: -5)
     }
     
     private var eventDetailsView: some View {
@@ -157,8 +205,7 @@ struct MapView: View {
                         viewModel.closeEventDetails()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.gray)
+                            .foregroundColor(.black)
                             .padding(8)
                             .background(Color.gray.opacity(0.1))
                             .clipShape(Circle())
@@ -180,6 +227,13 @@ struct MapView: View {
                             Text(viewModel.selectedEvent?.time ?? "")
                                 .font(.system(size: 16))
                         }
+                        
+                        HStack {
+                            Image(systemName: "dollarsign.circle")
+                                .foregroundColor(.blue)
+                            Text(String(format: "LKR %.2f", viewModel.selectedEvent?.price ?? 0))
+                                .font(.system(size: 16))
+                        }
                     }
                     
                     Spacer()
@@ -189,13 +243,24 @@ struct MapView: View {
                             .fill(viewModel.selectedEvent?.color ?? .blue)
                             .frame(width: 50, height: 50)
                         
-                        Image(systemName: viewModel.selectedEvent?.icon ?? "")
+                        Image(systemName: viewModel.selectedEvent?.icon ?? "star")
                             .font(.system(size: 24))
                             .foregroundColor(.white)
                     }
                 }
                 
                 Divider()
+                
+                if let description = viewModel.selectedEvent?.description, !description.isEmpty {
+                    Text("About Event")
+                        .font(.system(size: 18, weight: .bold))
+                    
+                    Text(description)
+                        .font(.system(size: 16))
+                        .lineLimit(4)
+                    
+                    Divider()
+                }
                 
                 HStack {
                     Image(systemName: "location.fill")
@@ -213,16 +278,32 @@ struct MapView: View {
                     }
                 }
                 
-                Button(action: {
-                    viewModel.joinEvent()
-                }) {
-                    Text("Join Event")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.white)
+                if viewModel.isLoading {
+                    Button(action: {}) {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            Spacer()
+                        }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.blue)
+                        .background(Color.blue.opacity(0.7))
                         .cornerRadius(12)
+                    }
+                    .disabled(true)
+                } else {
+                    Button(action: {
+                        viewModel.joinEvent()
+                    }) {
+                        Text("Join Event")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.blue)
+                            .cornerRadius(12)
+                    }
                 }
             }
             .padding(24)
@@ -273,6 +354,10 @@ struct EventCardMap: View {
                     Text(event.date)
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
+                    
+                    Text(String(format: "LKR %.2f", event.price))
+                        .font(.system(size: 14))
+                        .foregroundColor(.blue)
                 }
                 
                 Spacer()

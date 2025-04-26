@@ -30,7 +30,7 @@ struct ProfileView: View {
                         freeTrialBannerView
                     }
                     
-                    upcomingEventsView
+                  //  upcomingEventsView
                     
                     menuListView
                 }
@@ -38,6 +38,9 @@ struct ProfileView: View {
             }
             
             bottomTabBar
+        }
+        .sheet(isPresented: $viewModel.showNotificationSettings) {
+            NotificationSettingsView()
         }
     }
     
@@ -203,16 +206,16 @@ struct ProfileView: View {
                 .font(.system(size: 18, weight: .bold))
                 .padding(.horizontal, 16)
             
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(viewModel.model.upcomingEvents) { event in
-                        EventCard(event: event) {
-                            viewModel.viewEventDetails(event)
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-            }
+//            ScrollView(.horizontal, showsIndicators: false) {
+//                HStack(spacing: 16) {
+//                    ForEach(viewModel.model.upc) { event in
+//                        EventCard(event: event) {
+//                            viewModel.viewEventDetails(event)
+//                        }
+//                    }
+//                }
+//                .padding(.horizontal, 16)
+//            }
         }
     }
     
@@ -298,7 +301,6 @@ struct EventCard: View {
         VStack(alignment: .leading, spacing: 12) {
             ZStack(alignment: .bottomLeading) {
                 Rectangle()
-                    .fill(event.color)
                     .frame(height: 100)
                     .cornerRadius(12, corners: [.topLeft, .topRight])
                 
@@ -318,7 +320,7 @@ struct EventCard: View {
                         .foregroundColor(.gray)
                         .font(.system(size: 12))
                     
-                    Text(event.time)
+                    Text("")
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
                 }

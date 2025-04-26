@@ -69,8 +69,11 @@ struct EventsAPI {
             token: token
         )
     }
-    
-    // MARK: - Reviews
+        
+    func searchEvents(query: String, token: String? = nil) async throws -> EventsResponse {
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return try await APIClient.shared.request(endpoint: "/events/search?query=\(encodedQuery)", token: token)
+    }
     
     func getEventReviews(token: String, eventId: String, type: String? = nil) async throws -> ReviewsResponse {
         var endpoint = "/events/\(eventId)/reviews"
@@ -135,8 +138,6 @@ struct EmptyResponse: Decodable {
 }
 
 struct EmptyData: Decodable {}
-
-// MARK: - Review Response Types
 
 struct ReviewsResponse: Decodable {
     let status: String

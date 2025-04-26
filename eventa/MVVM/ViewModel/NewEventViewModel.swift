@@ -20,6 +20,8 @@ class NewEventViewModel: ObservableObject {
     init() {
         self.model = NewEventModel()
         self.formData = EventFormData()
+        
+        fetchCurrentUser()
     }
     
     func saveEvent(completion: @escaping () -> Void) {
@@ -41,6 +43,20 @@ class NewEventViewModel: ObservableObject {
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "HH:mm"
         
+         formData.price = formData.lowestTicketPrice
+        
+        let ticketsData = formData.tickets.map { ticket -> [String: Any] in
+            return [
+                "name": ticket.name,
+                "description": ticket.description,
+                "price": [
+                    "amount": ticket.price,
+                    "currency": "LKR"
+                ],
+                "quantity": ticket.maxQuantity
+            ]
+        }
+        
         var eventData: [String: Any] = [
             "title": formData.title,
             "description": formData.description,
@@ -51,6 +67,7 @@ class NewEventViewModel: ObservableObject {
                 "amount": Double(formData.price) ?? 0,
                 "currency": "LKR"
             ],
+            "tickets": ticketsData,
             "category": "Technology"
         ]
         
@@ -123,12 +140,16 @@ class NewEventViewModel: ObservableObject {
             }
         }
         
-        if formData.price.isEmpty {
-            errorMessage = "Please enter a price for your event"
+        if formData.tickets.isEmpty {
+            errorMessage = "Please add at least one ticket type"
             return false
-        } else if Double(formData.price) == nil {
-            errorMessage = "Please enter a valid price"
-            return false
+        }
+        
+        for (index, ticket) in formData.tickets.enumerated() {
+            if ticket.name.isEmpty {
+                errorMessage = "Please enter a name for ticket #\(index + 1)"
+                return false
+            }
         }
         
         return true
@@ -151,7 +172,6 @@ class NewEventViewModel: ObservableObject {
     func setStartTime(_ time: Date) {
         formData.startTime = time
         
-        // If end time is before start time, adjust end time to be 1 hour after start time
         if formData.endTime < formData.startTime {
             formData.endTime = Calendar.current.date(byAdding: .hour, value: 1, to: formData.startTime) ?? formData.endTime
         }
@@ -179,5 +199,53 @@ class NewEventViewModel: ObservableObject {
     
     func toggleEventType() {
         formData.isOffline.toggle()
+    }
+    
+    
+    func addTicket() {
+        formData.tickets.append(EditableTicketType(name: "", price: 0, description: "", maxQuantity: -1))
+    }
+    
+    func removeTicket(at index: Int) {
+        guard index >= 0 && index < formData.tickets.count else { return }
+        formData.tickets.remove(at: index)
+    }
+    
+    func updateTicket(at index: Int, name: String? = nil, description: String? = nil, price: Double? = nil, maxQuantity: Int? = nil) {
+        guard index >= 0 && index < formData.tickets.count else { return }
+        
+        if let name = name {
+            formData.tickets[index].name = name
+        }
+        
+        if let description = description {
+            formData.tickets[index].description = description
+        }
+        
+        if let price = price {
+            formData.tickets[index].price = price
+        }
+        
+        if let maxQuantity = maxQuantity {
+            formData.tickets[index].maxQuantity = maxQuantity
+        }
+    }
+    
+    private func fetchCurrentUser() {
+        guard let token = TokenManager.shared.getToken() else {
+            return
+        }
+        
+        Task {
+            do {
+                let response = try await AuthAPI.shared.getUserProfile(token: token)
+                await MainActor.run {
+                    self.formData.hostName = response.data.user.fullName
+                    self.formData.hostImage = response.data.user.profileImage
+                }
+            } catch {
+                print("Error fetching user profile: \(error)")
+            }
+        }
     }
 }

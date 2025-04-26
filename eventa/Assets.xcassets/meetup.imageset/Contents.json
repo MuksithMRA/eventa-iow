@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "onboarding.png",
+      "filename" : "meetup.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "onboarding 1.png",
+      "filename" : "meetup 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "onboarding 2.png",
+      "filename" : "meetup 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

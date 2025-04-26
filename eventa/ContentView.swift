@@ -6,8 +6,22 @@ struct ContentView: View {
     @State private var currentView: AppView
     
     init() {
-        let initialView: AppView = ContentView.isUserLoggedIn() ? .home : .login
+        let initialView: AppView = ContentView.determineInitialView()
         _currentView = State(initialValue: initialView)
+    }
+    
+    static func determineInitialView() -> AppView {
+        let userDefaults = UserDefaults.standard
+        let isFirstLaunch = !userDefaults.bool(forKey: "hasLaunchedBefore")
+        
+        if isFirstLaunch {
+            userDefaults.set(true, forKey: "hasLaunchedBefore")
+            return .welcome
+        } else if isUserLoggedIn() {
+            return .home
+        } else {
+            return .login
+        }
     }
     
     static func isUserLoggedIn() -> Bool {

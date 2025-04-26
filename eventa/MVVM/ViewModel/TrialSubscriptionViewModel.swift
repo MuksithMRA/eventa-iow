@@ -36,10 +36,8 @@ class TrialSubscriptionViewModel: ObservableObject {
         
         Task<Void, Never> {
             do {
-                // Get auth token
                 let token = UserDefaults.standard.string(forKey: "auth_token")
                 
-                // Create API request
                 let url = URL(string: "http://localhost:5001/api/subscriptions/trial")!
                 var request = URLRequest(url: url)
                 request.httpMethod = "POST"
@@ -56,16 +54,13 @@ class TrialSubscriptionViewModel: ObservableObject {
                     return
                 }
                 
-                // Make API call
                 let (data, response) = try await URLSession.shared.data(for: request)
                 
-                // Handle response
                 guard let httpResponse = response as? HTTPURLResponse else {
                     throw NSError(domain: "SubscriptionError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid response"])
                 }
                 
                 if (200...299).contains(httpResponse.statusCode) {
-                    // Decode response
                     let decoder = JSONDecoder()
                     let subscriptionResponse = try decoder.decode(SubscriptionResponse.self, from: data)
                     
@@ -85,7 +80,6 @@ class TrialSubscriptionViewModel: ObservableObject {
                         }
                     }
                 } else {
-                    // Handle error response
                     throw NSError(domain: "SubscriptionError", code: httpResponse.statusCode, 
                                   userInfo: [NSLocalizedDescriptionKey: "Server error: \(httpResponse.statusCode)"])
                 }

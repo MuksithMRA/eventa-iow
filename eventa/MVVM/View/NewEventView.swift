@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import MapKit
+import UIKit
 
 struct NewEventView: View {
     @StateObject private var viewModel = NewEventViewModel()
@@ -28,8 +29,6 @@ struct NewEventView: View {
                     endTimeSection
                     
                     descriptionField
-                    
-                    themeSection
                     
                     priceSection
                 }
@@ -346,23 +345,143 @@ struct NewEventView: View {
     }
     
     private var priceSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(viewModel.model.priceText)
-                .font(.system(size: 16, weight: .medium))
-            
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("LKR")
-                    .font(.system(size: 16))
-                    .foregroundColor(.gray)
-                    .padding(.leading, 16)
+                Text(viewModel.model.priceText)
+                    .font(.system(size: 16, weight: .medium))
                 
-                TextField("", text: $viewModel.formData.price)
-                    .keyboardType(.numberPad)
+                Spacer()
+                
+                Button(action: {
+                    viewModel.addTicket()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 14))
+                        Text("Add Ticket Type")
+                            .font(.system(size: 14))
+                    }
+                    .foregroundColor(.blue)
+                }
             }
-            .padding(.vertical, 16)
-            .background(Color.white)
+            
+            if viewModel.formData.tickets.isEmpty {
+                Text("Add at least one ticket type")
+                    .font(.system(size: 14))
+                    .foregroundColor(.gray)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white)
+                    .cornerRadius(8)
+            } else {
+                ForEach(0..<viewModel.formData.tickets.count, id: \.self) { index in
+                    ticketRow(for: index)
+                }
+            }
+        }
+    }
+    
+    private func ticketRow(for index: Int) -> some View {
+        let ticket = viewModel.formData.tickets[index]
+        
+        return VStack(spacing: 12) {
+            HStack {
+                Text(ticket.name.isEmpty ? "Ticket #\(index + 1)" : ticket.name)
+                    .font(.system(size: 15, weight: .medium))
+                
+                Spacer()
+                
+                if viewModel.formData.tickets.count > 1 {
+                    Button(action: {
+                        viewModel.removeTicket(at: index)
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                            .font(.system(size: 14))
+                    }
+                }
+            }
+            
+            VStack(spacing: 10) {
+                HStack {
+                    Text("Name:")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                        .frame(width: 80, alignment: .leading)
+                    
+                    TextField("Ticket name", text: Binding(
+                        get: { ticket.name },
+                        set: { viewModel.updateTicket(at: index, name: $0) }
+                    ))
+                    .font(.system(size: 14))
+                }
+                
+                HStack {
+                    Text("Description:")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                        .frame(width: 80, alignment: .leading)
+                    
+                    TextField("Short description", text: Binding(
+                        get: { ticket.description },
+                        set: { viewModel.updateTicket(at: index, description: $0) }
+                    ))
+                    .font(.system(size: 14))
+                }
+                
+                HStack {
+                    Text("Price:")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                        .frame(width: 80, alignment: .leading)
+                    
+                    Text("LKR")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                    
+                    TextField("0.00", text: Binding(
+                        get: { String(format: "%.2f", ticket.price) },
+                        set: { 
+                            if let price = Double($0) {
+                                viewModel.updateTicket(at: index, price: price)
+                            }
+                        }
+                    ))
+                    .font(.system(size: 14))
+                    .keyboardType(.decimalPad)
+                }
+                
+                HStack {
+                    Text("Quantity:")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                        .frame(width: 80, alignment: .leading)
+                    
+                    TextField("Unlimited", text: Binding(
+                        get: { ticket.maxQuantity == -1 ? "" : String(ticket.maxQuantity) },
+                        set: { 
+                            if $0.isEmpty {
+                                viewModel.updateTicket(at: index, maxQuantity: -1)
+                            } else if let quantity = Int($0) {
+                                viewModel.updateTicket(at: index, maxQuantity: quantity)
+                            }
+                        }
+                    ))
+                    .font(.system(size: 14))
+                    .keyboardType(.numberPad)
+                    
+                    Text("(Leave empty for unlimited)")
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding(12)
+            .background(Color(.systemGray6))
             .cornerRadius(8)
         }
+        .padding(12)
+        .background(Color.white)
+        .cornerRadius(8)
     }
     
     private var loadingView: some View {

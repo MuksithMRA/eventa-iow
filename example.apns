@@ -1,0 +1,10 @@
+{
+    "aps": {
+      "alert": {
+        "title": "Demo Push",
+        "body": "This is a push notification demo in simulator!"
+      },
+      "sound": "default"
+    }
+  }
+  

@@ -7,7 +7,10 @@ class HomeViewModel: ObservableObject {
     @Published var events: [EventItem] = []
     @Published var featuredEvents: [EventItem] = []
     @Published var upcomingEvents: [EventItem] = []
+    @Published var searchResults: [EventItem] = []
     @Published var isLoading: Bool = false
+    @Published var isSearching: Bool = false
+    @Published var searchQuery: String = ""
     @Published var errorMessage: String = ""
     @Published var selectedTab: Int = 0
     @Published var userLocation: String = "Colombo, Sri Lanka"
@@ -80,7 +83,7 @@ class HomeViewModel: ObservableObject {
                 timeRange: event.starttime + " - " + event.endtime,
                 price: event.price.amount,
                 isJoined: false,
-                description: ""
+                description: event.description
             )
         }
     }
@@ -114,5 +117,34 @@ class HomeViewModel: ObservableObject {
     
     func viewNotifications() {
         
+    }
+    
+    func searchEvents(query: String) {
+        guard !query.isEmpty else {
+            searchResults = []
+            isSearching = false
+            return
+        }
+        
+        isSearching = true
+        searchResults = []
+        
+        Task {
+            do {
+                let response = try await EventsAPI.shared.searchEvents(query: query)
+                
+                await MainActor.run {
+                    self.searchResults = convertToEventItems(events: response.data.events)
+                    self.isSearching = false
+                    print("Search results: \(self.searchResults.count) items")
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "Failed to search events: \(error.localizedDescription)"
+                    self.isSearching = false
+                    print("Search error: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 }

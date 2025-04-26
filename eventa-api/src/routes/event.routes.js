@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.get('/', eventController.getAllEvents);
 router.get('/featured', eventController.getFeaturedEvents);
+router.get('/search', eventController.searchEvents);
 router.get('/:id', eventController.getEvent);
 
 router.use(authMiddleware.protect);
