@@ -52,6 +52,7 @@ class EventDetailsViewModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var reviews: [Review] = []
     @Published var isLoadingReviews: Bool = false
+    @Published var hasUserReviewed: Bool = false
     @Published var reviewContent: String = ""
     @Published var reviewRating: Int = 5
     @Published var selectedReviewType: ReviewType = .positive
@@ -145,6 +146,10 @@ class EventDetailsViewModel: ObservableObject {
                         )
                     }
                     
+                    if let currentUserId = TokenManager.shared.getUserId() {
+                        self.hasUserReviewed = response.data.reviews.contains { $0.user.id == currentUserId }
+                    }
+                    
                     self.isLoadingReviews = false
                 }
             } catch {
@@ -211,6 +216,7 @@ class EventDetailsViewModel: ObservableObject {
                     self.reviews.insert(newReview, at: 0)
                     self.reviewContent = ""
                     self.reviewRating = 5
+                    self.hasUserReviewed = true
                     self.isLoadingReviews = false
                 }
             } catch {

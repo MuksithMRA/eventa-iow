@@ -1,5 +1,6 @@
 import MapKit
 import SwiftUI
+import Combine
 
 struct EventDetailsView: View {
     @StateObject private var viewModel: EventDetailsViewModel

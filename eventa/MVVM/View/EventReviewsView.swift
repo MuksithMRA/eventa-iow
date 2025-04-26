@@ -53,38 +53,46 @@ struct EventReviewsView: View {
             }
             .padding(.horizontal, 20)
             
-            VStack(spacing: 16) {
-                TextField("Write your review...", text: $viewModel.reviewContent)
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(8)
-
-                HStack {
-                    Text("Rating:")
-                        .font(.system(size: 16))
-
-                    Picker("Rating", selection: $viewModel.reviewRating) {
-                        ForEach(1...5, id: \.self) { rating in
-                            Text("\(rating)")
-                        }
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                }
-
-                Button(action: {
-                    viewModel.submitReview()
-                }) {
-                    Text("Submit Review")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.blue)
+            if !viewModel.hasUserReviewed {
+                VStack(spacing: 16) {
+                    TextField("Write your review...", text: $viewModel.reviewContent)
+                        .padding()
+                        .background(Color.gray.opacity(0.1))
                         .cornerRadius(8)
+
+                    HStack {
+                        Text("Rating:")
+                            .font(.system(size: 16))
+
+                        Picker("Rating", selection: $viewModel.reviewRating) {
+                            ForEach(1...5, id: \.self) { rating in
+                                Text("\(rating)")
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                    }
+
+                    Button(action: {
+                        viewModel.submitReview()
+                    }) {
+                        Text("Submit Review")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                    }
                 }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+            } else {
+                Text("You have already reviewed this event")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.gray)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
             
             if viewModel.isLoadingReviews {
                 HStack {
